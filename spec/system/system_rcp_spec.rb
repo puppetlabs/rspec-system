@@ -1,13 +1,6 @@
 require 'spec_helper_system'
 
-describe "basic tests:" do
-  it "check system_run works" do
-    system_run("cat /etc/hosts") do |r|
-      r[:exit_code].should == 0
-      r[:stdout].should =~ /localhost/
-    end
-  end
-
+describe "system_rcp:" do
   it 'check system_rcp works' do
     system_rcp(
       :sp => fixture_root + 'example_dir',
