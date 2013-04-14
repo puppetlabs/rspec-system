@@ -136,6 +136,7 @@ module RSpecSystem
     v.vm.host_name = '#{k}'
     v.vm.box = '#{ps['box']}'
     v.vm.box_url = '#{ps['box_url']}'
+    v.vm.base_mac = '#{randmac}'
   end
           EOS
         end
@@ -197,6 +198,14 @@ module RSpecSystem
     #   least.
     def tmppath
       '/tmp/' + random_string
+    end
+
+    # Return a random mac address
+    #
+    # @api private
+    # @return [String] a random mac address
+    def randmac
+      "080027" + (1..3).map{"%0.2X"%rand(256)}.join
     end
   end
 end
