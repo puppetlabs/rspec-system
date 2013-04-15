@@ -14,6 +14,8 @@ RSpec.configure do |c|
   c.add_setting :system_tmp
   # Block to execute for environment setup
   c.add_setting :system_setup_block
+  # Storage for ssh channels
+  c.add_setting :ssh_channels, :default => {}
 
   def nodeset
     Pathname.new(File.join(File.basename(__FILE__), '..', '.nodeset.yml'))
