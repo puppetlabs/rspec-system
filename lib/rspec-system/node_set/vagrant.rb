@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'systemu'
+require 'net/ssh'
 
 module RSpecSystem
   # A NodeSet implementation for Vagrant.
@@ -29,6 +30,16 @@ module RSpecSystem
 
       log.info "[Vagrant#setup] Running 'vagrant up'"
       vagrant("up")
+
+      # Establish ssh connectivity
+      ssh_channels = {}
+      nodes.each do |k,v|
+        log.info "[Vagrant#setup] establishing Net::SSH channel with #{k}"
+        chan = Net::SSH.start(k, 'vagrant', :config => ssh_config)
+        ssh_channels[k] = chan
+      end
+      RSpec.configuration.ssh_channels = ssh_channels
+
       nil
     end
 
@@ -36,6 +47,11 @@ module RSpecSystem
     #
     # @return [void]
     def teardown
+      log.info "[Vagrant#teardown] closing all ssh channels"
+      RSpec.configuration.ssh_channels.each do |k,v|
+        v.close unless v.closed?
+      end
+
       log.info "[Vagrant#teardown] Running 'vagrant destroy'"
       vagrant("destroy --force")
       nil
@@ -51,19 +67,8 @@ module RSpecSystem
       dest = opts[:n].name
       cmd = opts[:c]
 
-      r = nil
-      Dir.chdir(@vagrant_path) do
-        ex = "vagrant ssh #{dest} --command \"cd /tmp && sudo sh -c '#{cmd}'\""
-        log.debug("[vagrant#run] Running command: #{ex}")
-        r = systemu ex
-        log.debug("[Vagrant#run] Finished running command: #{ex}.")
-      end
-
-      {
-        :exit_code => r[0].exitstatus,
-        :stdout => r[1],
-        :stderr => r[2]
-      }
+      ssh_channels = RSpec.configuration.ssh_channels
+      ssh_exec!(ssh_channels[dest], "cd /tmp && sudo sh -c '#{cmd}'")
     end
 
     # Transfer files to a host in the NodeSet.
@@ -206,6 +211,49 @@ module RSpecSystem
     # @return [String] a random mac address
     def randmac
       "080027" + (1..3).map{"%0.2X"%rand(256)}.join
+    end
+
+    # Execute command via SSH.
+    #
+    # A special version of exec! from Net::SSH that returns exit code and exit
+    # signal as well. This method is blocking.
+    #
+    # @api private
+    # @param ssh [Net::SSH::Connection::Session] an active ssh session
+    # @param command [String] command to execute
+    # @return [Hash] a hash of results
+    def ssh_exec!(ssh, command)
+      r = {
+        :stdout => '',
+        :stderr => '',
+        :exit_code => nil,
+        :exit_signal => nil,
+      }
+      ssh.open_channel do |channel|
+        channel.exec(command) do |ch, success|
+          unless success
+            abort "FAILED: couldn't execute command (ssh.channel.exec)"
+          end
+          channel.on_data do |ch,data|
+            r[:stdout]+=data
+          end
+
+          channel.on_extended_data do |ch,type,data|
+            r[:stderr]+=data
+          end
+
+          channel.on_request("exit-status") do |ch,data|
+            r[:exit_code] = data.read_long
+          end
+
+          channel.on_request("exit-signal") do |ch, data|
+            r[:exit_signal] = data.read_string
+          end
+        end
+      end
+      ssh.loop
+
+      r
     end
   end
 end
