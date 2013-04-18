@@ -62,13 +62,15 @@ module RSpecSystem
     # @param opts [Hash] options
     # @return [Hash] a hash containing :exit_code, :stdout and :stderr
     def run(opts)
-      #log.debug("[Vagrant#run] called with #{opts.inspect}")
-
       dest = opts[:n].name
       cmd = opts[:c]
 
       ssh_channels = RSpec.configuration.ssh_channels
-      ssh_exec!(ssh_channels[dest], "cd /tmp && sudo sh -c '#{cmd}'")
+      puts "-----------------"
+      puts "#{dest}$ #{cmd}"
+      result = ssh_exec!(ssh_channels[dest], "cd /tmp && sudo sh -c '#{cmd}'")
+      puts "-----------------"
+      result
     end
 
     # Transfer files to a host in the NodeSet.
@@ -85,14 +87,13 @@ module RSpecSystem
       source = opts[:sp]
       dest_path = opts[:dp]
 
-      log.info("[Vagrant#rcp] Transferring files from #{source} to #{dest}:#{dest_path}")
-
       # Grab a remote path for temp transfer
       tmpdest = tmppath
 
       # Do the copy and print out results for debugging
       cmd = "scp -r -F '#{ssh_config}' '#{source}' #{dest}:#{tmpdest}"
-      log.debug("[Vagrant#rcp] Running command: #{cmd}")
+      puts "------------------"
+      puts "localhost$ #{cmd}"
       r = systemu cmd
 
       result = {
@@ -101,21 +102,12 @@ module RSpecSystem
         :stderr => r[2]
       }
 
-      log.info("scp results:\n" +
-        "-----------------------\n" +
-        "exit_code: #{result[:exit_code]}\n" +
-        "stdout:\n #{result[:stdout]}\n" +
-        "stderr:\n #{result[:stderr]}\n" +
-        "-----------------------\n")
+      print "#{result[:stdout]}"
+      print "#{result[:stderr]}"
+      puts "Exit code: #{result[:exit_code]}"
 
       # Now we move the file into their final destination
       result = run(:n => opts[:d], :c => "mv #{tmpdest} #{dest_path}")
-      log.info("move results:\n" +
-        "-----------------------\n" +
-        "exit_code: #{result[:exit_code]}\n" +
-        "stdout:\n #{result[:stdout]}\n" +
-        "stderr:\n #{result[:stderr]}\n" +
-        "-----------------------\n")
       if result[:exit_code] == 0
         return true
       else
@@ -235,19 +227,27 @@ module RSpecSystem
             abort "FAILED: couldn't execute command (ssh.channel.exec)"
           end
           channel.on_data do |ch,data|
-            r[:stdout]+=data
+            d = data
+            print d
+            r[:stdout]+=d
           end
 
           channel.on_extended_data do |ch,type,data|
-            r[:stderr]+=data
+            d = data
+            print d
+            r[:stderr]+=d
           end
 
           channel.on_request("exit-status") do |ch,data|
-            r[:exit_code] = data.read_long
+            c = data.read_long
+            puts "Exit code: #{c}"
+            r[:exit_code] = c
           end
 
           channel.on_request("exit-signal") do |ch, data|
-            r[:exit_signal] = data.read_string
+            s = data.read_string
+            puts "Exit signal: #{s}"
+            r[:exit_signal] = s
           end
         end
       end

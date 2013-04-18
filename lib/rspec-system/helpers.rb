@@ -116,14 +116,7 @@ module RSpecSystem::Helpers
       raise "Cannot use system_run with no :command option"
     end
 
-    log.info("system_run #{options[:c]} on #{options[:n].name} executed")
     result = ns.run(options)
-    log.info("system_run results:\n" +
-      "-----------------------\n" +
-      "exit_code: #{result[:exit_code]}\n" +
-      "stdout:\n #{result[:stdout]}\n" +
-      "stderr:\n #{result[:stderr]}\n" +
-      "-----------------------\n")
 
     if block_given?
       yield(result)
