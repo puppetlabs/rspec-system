@@ -171,13 +171,13 @@ The setup for a job is basically:
 * Use touchstone with a filter of RSPEC_SET=='centos-64-x64' so you don't chew up cycles running a whole batch of broken builds
 * Create an execute shell job like so:
 
-    #!/bin/bash
-    set +e
-
-    [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
-    rvm use ruby-2.0.0@some_unique_name_here --create
-
-    bundle update
-    rake spec:system
+        #!/bin/bash
+        set +e
+    
+        [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
+        rvm use ruby-2.0.0@some_unique_name_here --create
+    
+        bundle update
+        rake spec:system
 
 I went quite complex and had Github pull request integration working with this, and quite a few other nice features. If you need help setting it up get in touch.
