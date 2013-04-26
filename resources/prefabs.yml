@@ -84,6 +84,8 @@
     vagrant:
       box: 'centos-64-x64-vbox4210-nocm'
       box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/centos-64-x64-vbox4210-nocm.box'
+    vsphere:
+      template: 'centos-64-x64-vsphere'
 'fedora-18-x64':
   description: ""
   facts:
