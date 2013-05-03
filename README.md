@@ -4,7 +4,7 @@
 
 The goal here is to provide facilities to aid in the launching of tests nodes, copying of test content to such nodes, and executing commands on such nodes to be tested with standard rspec assertions within the standard rspec test format.
 
-*Note:* This library is fairly alpha at the moment, and the interface may change at without warning. That said, if you're good at ruby and have an opinion, I'd appreciate patches and improvements to move this further torwards stability.
+*Note:* This library is fairly alpha at the moment, and the interface may change without warning. That said, if you're good at ruby and have an opinion, I'd appreciate patches and improvements to move this further torwards stability.
 
 ### Gem installation
 
@@ -48,18 +48,18 @@ Create the directory `spec/system` in your project, make sure your unit tests go
       end
     end
 
-Also consult the example in `example` in the source of this library for more details.
+Also consult the examples in the `examples` directory in the source of this library for more details.
 
-For you reference, here are the list of custom rspec configuration items that can be overriden in your `spec_helper_system.rb` file:
+For your reference, here are the list of custom rspec configuration items that can be overriden in your `spec_helper_system.rb` file:
 
 * *system_setup_block* - this accepts a proc that is called after node setup, but before every test (ie. before suite). The goal of this option is to provide a good place for node setup independant of tests.
 * *system_tmp* - For some of our activity, we require a temporary file area. By default we just a random temporary path, so you normally do not need to set this.
 
-Currently to get the nice formatting rspec-system specific formatter its recommended to use the Rake task, so the following to your `Rakefile`:
+Currently to get the nice formatting rspec-system specific formatter its recommended to use the Rake task, so add the following to your `Rakefile`:
 
     require 'rspec-system/rake_task'
 
-That will setup the rake task `rake spec:system`.
+That will setup the `spec:system` rake task.
 
 ### Creating a nodeset file
 
@@ -121,7 +121,7 @@ Right now we have two types of plugins, the framework is in a state of flux as t
 
 Libraries that provide test helpers, and setup helpers for testing development on the software in question.
 
-* rspec-system-puppet <http://rubygems.org/gems/rspec-system-puppet>
+* [rspec-system-puppet](http://rubygems.org/gems/rspec-system-puppet)
 
 #### Node providers
 
