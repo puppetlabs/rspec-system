@@ -20,4 +20,6 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "kwalify"
   s.add_runtime_dependency "systemu"
   s.add_runtime_dependency "net-ssh", '~>2.6'
+  s.add_runtime_dependency "net-scp"
+  s.add_runtime_dependency "rbvmomi"
 end

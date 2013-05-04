@@ -16,6 +16,7 @@ RSpec.configure do |c|
   c.add_setting :system_setup_block
   # Storage for ssh channels
   c.add_setting :ssh_channels, :default => {}
+  c.add_setting :rspec_storage, :default => {}
 
   def nodeset
     Pathname.new(File.join(File.basename(__FILE__), '..', '.nodeset.yml'))
@@ -66,11 +67,24 @@ RSpec.configure do |c|
   c.system_tmp = Dir.mktmpdir
 
   c.before :suite do
-    start_nodes
-    call_custom_setup_block
+    # Before Suite exceptions get captured it seems
+    begin
+      start_nodes
+      call_custom_setup_block
+    rescue => ex
+      puts ex.inspect + " in"
+      puts ex.backtrace.join("\n  ")
+      exit(1)
+    end
   end
 
   c.after :suite do
-    stop_nodes
+    # After Suite exceptions get captured it seems
+    begin
+      stop_nodes
+    rescue => ex
+      puts ex.inspect + " in"
+      puts ex.backtrace.join("\n  ")
+    end
   end
 end

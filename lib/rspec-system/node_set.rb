@@ -9,6 +9,8 @@ module RSpecSystem
       case(virtual_env)
       when 'vagrant'
         RSpecSystem::NodeSet::Vagrant.new(setname, config)
+      when 'vsphere'
+        RSpecSystem::NodeSet::Vsphere.new(setname, config)
       else
         raise "Unsupported virtual environment #{virtual_env}"
       end
@@ -18,3 +20,4 @@ end
 
 require 'rspec-system/node_set/base'
 require 'rspec-system/node_set/vagrant'
+require 'rspec-system/node_set/vsphere'

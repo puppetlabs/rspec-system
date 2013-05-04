@@ -45,6 +45,8 @@
     vagrant:
       box: 'centos-59-x64-vbox4210-nocm'
       box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/centos-59-x64-vbox4210-nocm.box'
+    vsphere:
+      template: 'centos-59-x64-vs51-nocm'
 'centos-63-x64':
   description: "Vagrant images obtained from http://puppet-vagrant-boxes.puppetlabs.com"
   facts:
@@ -84,6 +86,8 @@
     vagrant:
       box: 'centos-64-x64-vbox4210-nocm'
       box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/centos-64-x64-vbox4210-nocm.box'
+    vsphere:
+      template: 'centos-64-x64-vs51-nocm'
 'fedora-18-x64':
   description: ""
   facts:
@@ -101,6 +105,8 @@
     vagrant:
       box: 'fedora-18-x64-vbox4210-nocm'
       box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/fedora-18-x64-vbox4210-nocm.box'
+    vsphere:
+      template: 'fedora-18-x64-vs51-nocm'
 'debian-606-x64':
   description: "Vagrant images obtained from http://puppet-vagrant-boxes.puppetlabs.com"
   facts:
@@ -142,6 +148,8 @@
     vagrant:
       box: 'debian-607-x64-vbox4210-nocm'
       box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/debian-607-x64-vbox4210-nocm.box'
+    vsphere:
+      template: 'debian-607-x64-vs51-nocm'
 'debian-70rc1-x64':
   description: ""
   facts:
@@ -164,6 +172,8 @@
     vagrant:
       box: 'debian-70rc1-x64-vbox4210-nocm'
       box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/debian-70rc1-x64-vbox4210-nocm.box'
+    vsphere:
+      template: 'debian-70rc1-x64-vs51-nocm'
 'ubuntu-server-1004-x64':
   description: ''
   facts:
@@ -208,6 +218,8 @@
     vagrant:
       box: 'ubuntu-server-10044-x64-vbox4210-nocm'
       box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-10044-x64-vbox4210-nocm.box'
+    vsphere:
+      template: 'ubuntu-server-10044-x64-vs51-nocm'
 'ubuntu-server-1204-x64':
   description: ''
   facts:
@@ -252,6 +264,8 @@
     vagrant:
       box: 'ubuntu-server-12042-x64-vbox4210-nocm'
       box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-12042-x64-vbox4210-nocm.box'
+    vsphere:
+      template: 'ubuntu-server-12042-x64-vs51-nocm'
 'sles-11sp1-x64':
   description: ''
   facts:
@@ -269,3 +283,5 @@
     vagrant:
       box: 'sles-11sp1-x64-vbox4210-nocm'
       box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/sles-11sp1-x64-vbox4210-nocm.box'
+    vsphere:
+      template: 'sles-11sp1-x64-vs51-nocm'
