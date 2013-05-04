@@ -1,7 +1,7 @@
 ---
-default_set: 'centos-58-x64'
+default_set: 'centos-59-x64'
 sets:
-  'centos-58-x64':
+  'centos-59-x64':
     nodes:
       "main":
-        prefab: 'centos-58-x64'
+        prefab: 'centos-59-x64'
