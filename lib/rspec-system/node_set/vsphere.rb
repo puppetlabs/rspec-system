@@ -29,6 +29,8 @@ module RSpecSystem
       RSpec.configuration.rspec_storage[:nodes] ||= {}
     end
 
+    # @!group NodeSet Methods
+
     # Setup the NodeSet by starting all nodes.
     #
     # @return [void]
@@ -85,7 +87,7 @@ module RSpecSystem
 
         timeout(60) do
           while(newvm.guest.guestState != 'running') do
-            sleep 1
+            sleep 2
             puts "#{k}> Waiting for vm to run ..."
           end
         end
@@ -190,82 +192,5 @@ module RSpecSystem
       end
     end
 
-    # Return a random string of chars, used for temp dir creation
-    #
-    # @api private
-    # @return [String] string of 50 random characters A-Z and a-z
-    def random_string(length = 50)
-      o =  [('a'..'z'),('A'..'Z')].map{|i| i.to_a}.flatten
-      (0...length).map{ o[rand(o.length)] }.join
-    end
-
-    # Generates a random string for use in remote transfers.
-    #
-    # @api private
-    # @return [String] a random path
-    # @todo Very Linux dependant, probably need to consider OS X and Windows at
-    #   least.
-    def tmppath
-      '/tmp/' + random_string
-    end
-
-    # Return a random mac address
-    #
-    # @api private
-    # @return [String] a random mac address
-    def randmac
-      "080027" + (1..3).map{"%0.2X"%rand(256)}.join
-    end
-
-    # Execute command via SSH.
-    #
-    # A special version of exec! from Net::SSH that returns exit code and exit
-    # signal as well. This method is blocking.
-    #
-    # @api private
-    # @param ssh [Net::SSH::Connection::Session] an active ssh session
-    # @param command [String] command to execute
-    # @return [Hash] a hash of results
-    def ssh_exec!(ssh, command)
-      r = {
-        :stdout => '',
-        :stderr => '',
-        :exit_code => nil,
-        :exit_signal => nil,
-      }
-      ssh.open_channel do |channel|
-        channel.exec(command) do |ch, success|
-          unless success
-            abort "FAILED: couldn't execute command (ssh.channel.exec)"
-          end
-          channel.on_data do |ch,data|
-            d = data
-            print d
-            r[:stdout]+=d
-          end
-
-          channel.on_extended_data do |ch,type,data|
-            d = data
-            print d
-            r[:stderr]+=d
-          end
-
-          channel.on_request("exit-status") do |ch,data|
-            c = data.read_long
-            puts "Exit code: #{c}"
-            r[:exit_code] = c
-          end
-
-          channel.on_request("exit-signal") do |ch, data|
-            s = data.read_string
-            puts "Exit signal: #{s}"
-            r[:exit_signal] = s
-          end
-        end
-      end
-      ssh.loop
-
-      r
-    end
   end
 end
