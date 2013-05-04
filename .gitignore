@@ -3,3 +3,6 @@ Gemfile.lock
 .*.swp
 doc/
 .yardoc
+vendor/
+.bundle
+spec/reports/
