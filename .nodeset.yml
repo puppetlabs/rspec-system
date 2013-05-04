@@ -53,3 +53,10 @@ sets:
     nodes:
       "main":
         prefab: 'sles-11sp1-x64'
+  'centos-64-x64-multi':
+    default_node: 'first'
+    nodes:
+      "first":
+        prefab: 'centos-64-x64'
+      "second":
+        prefab: 'centos-64-x64'
