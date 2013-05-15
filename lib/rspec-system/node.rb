@@ -7,10 +7,12 @@ module RSpecSystem
     # @param nodeset [RSpecSystem::Node] nodeset that this node belongs to
     # @param k [String] name of node
     # @param v [Hash<String,String>] hash configuration as given from the nodeset yaml file
+    # @param custom_prefabs_path [String] path of custom prefabs yaml file
     # @return [RSpecSystem::Node] returns a new node object
-    def self.node_from_yaml(nodeset, k, v)
+    def self.node_from_yaml(nodeset, k, v, custom_prefabs_path)
       RSpecSystem::Node.new(
         :nodeset => nodeset,
+        :custom_prefabs_path => custom_prefabs_path,
         :name => k,
         :prefab => v['prefab']
       )
@@ -23,16 +25,19 @@ module RSpecSystem
     # @option options [String] :prefab prefab setting. Mandatory.
     # @option options [RSpecSystem::NodeSet] :nodeset the parent nodeset for
     #   this node. Mandatory.
+    # @option options [String] :custom_prefabs_path path of custom prefabs
+    #   yaml file. Optional.
     def initialize(options)
       @name = options[:name]
       prefab = options[:prefab]
       @nodeset = options[:nodeset]
+      @custom_prefabs_path = options[:custom_prefabs_path]
 
       if prefab.nil?
         # TODO: do not support not prefabs yet
         raise "No prefab defined, bailing"
       else
-        @prefab = RSpecSystem::Prefab.prefab(prefab)
+        @prefab = RSpecSystem::Prefab.prefab(prefab, custom_prefabs_path)
         @facts = @prefab.facts
         @provider_specifics = @prefab.provider_specifics
       end

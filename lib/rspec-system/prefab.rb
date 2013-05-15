@@ -7,8 +7,15 @@ module RSpecSystem
     attr_reader :provider_specifics
 
     # Return prefab object based on name
-    def self.prefab(name)
+    def self.prefab(name, custom_prefabs_path)
+      if File.exists?(custom_prefabs_path)
+        custom_prefabs = YAML.load_file(custom_prefabs_path)
+      else
+        custom_prefabs = {}
+      end
+
       prefabs = YAML.load_file(File.join(File.dirname(__FILE__), '..', '..', 'resources', 'prefabs.yml'))
+      prefabs.merge!(custom_prefabs)
       raise "No such prefab" unless pf = prefabs[name]
 
       RSpecSystem::Prefab.new(

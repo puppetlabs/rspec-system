@@ -15,8 +15,9 @@ module RSpecSystem
     #
     # @param setname [String] name of the set to instantiate
     # @param config [Hash] nodeset configuration hash
+    # @param custom_prefabs_path [String] path of custom prefabs yaml file
     # @param options [Hash] options Hash
-    def initialize(setname, config, options)
+    def initialize(setname, config, custom_prefabs_path, options)
       super
       @vim = RbVmomi::VIM.connect(
         :host => ENV["RSPEC_VSPHERE_HOST"],
