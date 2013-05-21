@@ -13,7 +13,8 @@ module RSpecSystem
     #
     # @param setname [String] name of the set to instantiate
     # @param config [Hash] nodeset configuration hash
-    def initialize(setname, config)
+    # @param options [Hash] options Hash
+    def initialize(setname, config, options)
       super
       @vagrant_path = File.expand_path(File.join(RSpec.configuration.system_tmp, 'vagrant_projects', setname))
     end
@@ -52,8 +53,12 @@ module RSpecSystem
         v.close unless v.closed?
       end
 
-      log.info "[Vagrant#teardown] Running 'vagrant destroy'"
-      vagrant("destroy --force")
+      if destroy
+        log.info "[Vagrant#teardown] Running 'vagrant destroy'"
+        vagrant("destroy --force")
+      else
+        log.info "[Vagrant#teardown] Skipping 'vagrant destroy'"
+      end
       nil
     end
 
