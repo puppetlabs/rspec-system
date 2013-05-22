@@ -1,3 +1,5 @@
+require 'rspec-system/result'
+
 # This module contains the main rspec helpers that are to be used within
 # rspec-system tests. These are the meat-and-potatoes of your system tests,
 # and in theory there shouldn't be anything you can't do without the helpers
@@ -20,8 +22,8 @@
 #   describe 'test running' do
 #     it 'run cat' do
 #       system_run 'cat /etc/resolv.conf' do |r|
-#         r[:exit_code].should == 0
-#         r[:stdout].should =~ /localhost/
+#         r.exit_code.should == 0
+#         r.stdout.should =~ /localhost/
 #       end
 #     end
 #   end
@@ -59,9 +61,9 @@
 #     it 'test installing latest puppet' do
 #       install_puppet
 #       system_run('puppet apply --version') do |r|
-#         r[:exit_code] == 0
-#         r[:stdout].should =~ /3.1/
-#         r[:stderr].should == ''
+#         r.exit_code == 0
+#         r.stdout.should =~ /3.1/
+#         r.stderr.should == ''
 #       end
 #     end
 #   end
@@ -92,8 +94,10 @@ module RSpecSystem::Helpers
   #   that) specifies node to execute command on.
   # @option options [RSpecSystem::Node] :n alias for :node
   # @yield [result] yields result when called as a block
-  # @yieldparam result [Hash] a hash containing :exit_code, :stdout and :stderr
-  # @return [Hash] a hash containing :exit_code, :stdout and :stderr
+  # @yieldparam result [RSpecSystem::Result] a result containing :exit_code,
+  #   :stdout and :stderr
+  # @return [RSpecSystem::Result] a result containing :exit_code, :stdout and
+  #   :stderr
   def system_run(options)
     ns = rspec_system_node_set
     dn = ns.default_node
@@ -116,7 +120,7 @@ module RSpecSystem::Helpers
       raise "Cannot use system_run with no :command option"
     end
 
-    result = ns.run(options)
+    result = RSpecSystem::Result.new(ns.run(options))
 
     if block_given?
       yield(result)
