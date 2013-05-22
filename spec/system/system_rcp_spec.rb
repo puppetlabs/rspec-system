@@ -8,8 +8,8 @@ describe "system_rcp:" do
     )
 
     system_run('cat /tmp/example_destination/example_file') do |r|
-      r[:exit_code].should == 0
-      r[:stdout].should =~ /Test content 1234/
+      r.exit_code.should == 0
+      r.stdout.should =~ /Test content 1234/
     end
   end
 end
