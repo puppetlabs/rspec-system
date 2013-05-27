@@ -86,6 +86,8 @@ The file must adhere to the Kwalify schema supplied in `resources/kwalify-schema
 
 ### Prefabs
 
+Prefabs are 'pre-rolled' virtual images, for now its the only way to specify a template.
+
 The current built-in prefabs are defined in `resources/prefabs.yml`. The current set are based on boxes hosted on <http://puppet-vagrant-boxes.puppetlabs.com> as they have been built by myself and are generally trusted and have a reproducable build cycle (they aren't just 'golden images'). In the future I'll probably expand that list, but attempt to stick to boxes that we have control over.
 
 Prefabs are designed to be generic across different hosting environments. For example, you should be able to use a prefab string and launch an EC2 or Vagrant image and find that the images are identical (or as much as possible). The goal should be that local Vagrant users should find their own local tests pass, and when submitting code this should not change for EC2.
