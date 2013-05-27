@@ -6,6 +6,7 @@ module RSpecSystem
   # A NodeSet implementation for Vagrant.
   class NodeSet::Vagrant < RSpecSystem::NodeSet::Base
     include RSpecSystem::Log
+    include RSpecSystem::Util
 
     ENV_TYPE = 'vagrant'
 
@@ -73,7 +74,7 @@ module RSpecSystem
       ssh_channels = RSpec.configuration.ssh_channels
       puts "-----------------"
       puts "#{dest}$ #{cmd}"
-      result = ssh_exec!(ssh_channels[dest], "cd /tmp && sudo sh -c '#{cmd}'")
+      result = ssh_exec!(ssh_channels[dest], "cd /tmp && sudo sh -c #{shellescape(cmd)}")
       puts "-----------------"
       result
     end
@@ -127,7 +128,7 @@ module RSpecSystem
       log.info "[Vagrant#create_vagrantfile] Creating vagrant file here: #{@vagrant_path}"
       FileUtils.mkdir_p(@vagrant_path)
       File.open(File.expand_path(File.join(@vagrant_path, "Vagrantfile")), 'w') do |f|
-        f.write('Vagrant::Config.run do |c|')
+        f.write("Vagrant::Config.run do |c|\n")
         nodes.each do |k,v|
           log.debug "Filling in content for #{k}"
 

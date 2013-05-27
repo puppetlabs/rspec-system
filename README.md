@@ -43,7 +43,7 @@ Create the directory `spec/system` in your project, its recommended to make sure
     describe 'basics' do
       it 'should cat /etc/resolv.conf' do
         system_run('cat /etc/resolv.conf') do |r|
-          r[:stdout].should =~ /localhost/
+          r.stdout.should =~ /localhost/
         end
       end
     end
