@@ -124,6 +124,7 @@ Instead of switches, we use a number of environment variables to modify the beha
 
 * *RSPEC_VIRTUAL_ENV* - set this to `vagrant` if you wish, for now `vagrant` is the default so this is optional.
 * *RSPEC_SET* - the set to use when running tests (defaults to the `default_set` setting in the projects `.nodeset.yml` file). This string must align with the entries under `sets` in your `.nodeset.yml`.
+* *RSPEC_DESTROY* - set this to `no` if you do not want the VM to be destroyed before or after a test completes.  May be useful during initial testing of rspec tests to allow inspection of the VM.
 
 So if you wanted to run an alternate nodeset you could use:
 
@@ -141,6 +142,7 @@ This provider has a lot more options for setup, in the form of environment varia
 
 * *RSPEC_VIRTUAL_ENV* - set this to 'vsphere' to use this provider
 * *RSPEC_SET* - same as the vagrant provider, this defines the 'set' to launch.
+* *RSPEC_DESTROY* - same as the vagrant provider, defines if the VM should be destroyed before and after a test.
 * *RSPEC_VSPHERE_HOST* - hostname of your vsphere api
 * *RSPEC_VSPHERE_USER* - username to authenticate with
 * *RSPEC_VSPHERE_PASS* - password to authenticate with

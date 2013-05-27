@@ -31,10 +31,18 @@ RSpec.configure do |c|
     ENV["RSPEC_VIRTUAL_ENV"] || 'vagrant'
   end
 
+  # Defines if a set will be destroyed before and after tests
+  def rspec_destroy
+    return false if ENV["RSPEC_DESTROY"] =~ /(no|false)/
+    return true
+  end
+
   def rspec_system_node_set
     setname = ENV['RSPEC_SET'] || rspec_system_config['default_set']
     config = rspec_system_config['sets'][setname]
-    RSpecSystem::NodeSet.create(setname, config, rspec_virtual_env)
+    options = {}
+    options[:destroy] = rspec_destroy
+    RSpecSystem::NodeSet.create(setname, config, rspec_virtual_env, options)
   end
 
   def start_nodes
@@ -45,6 +53,7 @@ RSpec.configure do |c|
     log.info "Configuration is: " + ns.config.pretty_inspect
     log.info "Virtual Environment type is: #{ns.env_type}"
     log.info "Default node is: #{ns.default_node.name}"
+    log.info "Destroy node is: #{ns.destroy}"
 
     ns.setup
   end
