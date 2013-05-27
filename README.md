@@ -86,8 +86,6 @@ The file must adhere to the Kwalify schema supplied in `resources/kwalify-schema
 
 ### Prefabs
 
-Prefabs are 'pre-rolled' virtual images, for now its the only way to specify a template. In the future we will probably allow you to specify your own prefab file, and override prefab settings in a nodeset file as well.
-
 The current built-in prefabs are defined in `resources/prefabs.yml`. The current set are based on boxes hosted on <http://puppet-vagrant-boxes.puppetlabs.com> as they have been built by myself and are generally trusted and have a reproducable build cycle (they aren't just 'golden images'). In the future I'll probably expand that list, but attempt to stick to boxes that we have control over.
 
 Prefabs are designed to be generic across different hosting environments. For example, you should be able to use a prefab string and launch an EC2 or Vagrant image and find that the images are identical (or as much as possible). The goal should be that local Vagrant users should find their own local tests pass, and when submitting code this should not change for EC2.
@@ -95,6 +93,42 @@ Prefabs are designed to be generic across different hosting environments. For ex
 For this reason there are various `provider_specific` settings that apply to different provider types. For now though, only `vagrant` specific settings are provided.
 
 `facts` in the prefab are literally dumps of `facter -p` on the host stored in the prefab file so you can look them up without addressing the machine. These are accessed using the `system_node#facts` method on the helper results and can be used in conditional logic during test runs and setup tasks. Not all the facts are supplied, only the more interesting ones.
+
+#### Custom Prefabs
+
+To define custom prefabs place a `.prefabs.yml` file in your project's root directory.
+
+    ---
+    'scientific-64-x64':
+      description: ""
+      facts:
+        kernelrelease: "2.6.32-358.el6.x86_64"
+        operatingsystem: Scientific
+        kernelmajversion: "2.6"
+        architecture: x86_64
+        facterversion: "1.7.0"
+        kernelversion: "2.6.32"
+        operatingsystemrelease: "6.4"
+        osfamily: RedHat
+        kernel: Linux
+        rubyversion: "1.8.7"
+      provider_specifics:
+        vagrant:
+          box: 'scientific-64-x64-vb4210-nocm'
+          box_url: 'http://example.com/path/to/scientific-64-x64-vb4210-nocm.box'
+
+#### Overriding Prefabs
+
+The custom prefab file, `.prefabs.yml` can also be used to override any of the built-in Prefabs.
+
+For example, to use a different box for CentOS 6.4 x64, you can override the `box_url`.  The example below overrides the URL to use the box with configuration management already installed.
+
+    ---
+    'centos-64-x64':
+      provider_specifics:
+        vagrant:
+          box: 'centos-64-x64-vbox4210'
+          box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/centos-64-x64-vbox4210.box'
 
 ### Running tests
 
