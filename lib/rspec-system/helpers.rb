@@ -1,4 +1,6 @@
 require 'rspec-system/result'
+require 'rspec-system/helpers/shell'
+require 'rspec-system/helpers/rcp'
 
 # This module contains the main rspec helpers that are to be used within
 # rspec-system tests. These are the meat-and-potatoes of your system tests,
@@ -68,10 +70,8 @@ module RSpecSystem::Helpers
   #   @overload $0(command)
   #     @param command [String] command to execute
   #   @yield [result] yields result when called as a block
-  #   @yieldparam result [RSpecSystem::Result] result of run containing
-  #     :exit_code, :stdout and :stderr
-  #   @return [RSpecSystem::Result] result of run containing :exit_code,
-  #     :stdout and :stderr
+  #   @yieldparam result [RSpecSystem::Helpers::Shell] result of run
+  #   @return [RSpecSystem::Helpers::Shell] result of run
 
   # Runs a shell command on a test host.
   #
@@ -111,34 +111,13 @@ module RSpecSystem::Helpers
   #     end
   #   end
   def shell(options, &block)
-    ns = rspec_system_node_set
-    dn = ns.default_node
-
     # If options is a string, turn the string into a command in the normal
     # options hash.
     if options.is_a?(String)
       options = {:c => options}
     end
 
-    # Defaults etc.
-    options = {
-      :node => options[:n] || dn,
-      :n => options[:node] || dn,
-      :c => options[:command],
-      :command => options[:c],
-    }.merge(options)
-
-    if options[:c].nil?
-      raise "Cannot use shell with no :command option"
-    end
-
-    result = RSpecSystem::Result.new(ns.run(options))
-
-    if block_given?
-      yield(result)
-    else
-      result
-    end
+    RSpecSystem::Helpers::Shell.new(options, self, &block)
   end
 
   # Legacy method for running a shell command.
@@ -182,25 +161,8 @@ module RSpecSystem::Helpers
   #       rcp :sp => 'mydata', :dp => '/srv/data'.should be_true
   #     end
   #   end
-  def rcp(options)
-    ns = rspec_system_node_set
-    options = {
-      :source_path => options[:sp],
-      :destination_path => options[:dp],
-      :dp => options[:destination_path],
-      :sp => options[:source_path],
-      :destination_node => ns.default_node,
-      :d => ns.default_node,
-      :source_node => nil,
-      :s => nil,
-    }.merge(options)
-
-    d = options[:d]
-    sp = options[:sp]
-    dp = options[:dp]
-
-    log.info("rcp from #{sp} to #{d.name}:#{dp} executed")
-    ns.rcp(options)
+  def rcp(options, &block)
+    RSpecSystem::Helpers::Rcp.new(options, self, &block)
   end
 
   # Legacy method for copying a file to a test host
