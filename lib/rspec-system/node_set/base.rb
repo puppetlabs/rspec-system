@@ -7,11 +7,13 @@ module RSpecSystem
     attr_reader :config
     attr_reader :setname
     attr_reader :nodes
+    attr_reader :destroy
 
     # Create new NodeSet, populating necessary data structures.
-    def initialize(setname, config)
+    def initialize(setname, config, options)
       @setname = setname
       @config = config
+      @destroy = options[:destroy]
 
       @nodes = {}
       config['nodes'].each do |k,v|
