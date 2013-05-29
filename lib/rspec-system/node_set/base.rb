@@ -6,18 +6,20 @@ module RSpecSystem
   class NodeSet::Base
     attr_reader :config
     attr_reader :setname
+    attr_reader :custom_prefabs_path
     attr_reader :nodes
     attr_reader :destroy
 
     # Create new NodeSet, populating necessary data structures.
-    def initialize(setname, config, options)
+    def initialize(setname, config, custom_prefabs_path, options)
       @setname = setname
       @config = config
+      @custom_prefabs_path = custom_prefabs_path
       @destroy = options[:destroy]
 
       @nodes = {}
       config['nodes'].each do |k,v|
-        @nodes[k] = RSpecSystem::Node.node_from_yaml(self, k, v)
+        @nodes[k] = RSpecSystem::Node.node_from_yaml(self, k, v, custom_prefabs_path)
       end
     end
 

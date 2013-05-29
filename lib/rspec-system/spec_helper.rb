@@ -22,6 +22,10 @@ RSpec.configure do |c|
     Pathname.new(File.join(File.basename(__FILE__), '..', '.nodeset.yml'))
   end
 
+  def custom_prefabs_path
+    File.expand_path(File.join(File.basename(__FILE__), '..', '.prefabs.yml'))
+  end
+
   def rspec_system_config
     YAML.load_file('.nodeset.yml')
   end
@@ -42,7 +46,7 @@ RSpec.configure do |c|
     config = rspec_system_config['sets'][setname]
     options = {}
     options[:destroy] = rspec_destroy
-    RSpecSystem::NodeSet.create(setname, config, rspec_virtual_env, options)
+    RSpecSystem::NodeSet.create(setname, config, rspec_virtual_env, custom_prefabs_path, options)
   end
 
   def start_nodes
