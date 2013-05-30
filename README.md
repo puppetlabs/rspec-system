@@ -29,21 +29,26 @@ Start by creating a helper file in `spec/spec_helper_system.rb` containing somet
     require 'rspec-system/spec_helper'
 
     RSpec.configure do |c|
-      c.system_setup_block = proc do
-        include RSpecSystem::Helpers
+      c.before :suite do
         # Insert some setup tasks here
         system_run('yum install -y ntp')
       end
     end
 
-Create the directory `spec/system` in your project, its recommended to make sure your unit tests go into `spec/unit` instead so you can isolate them easily during test time. Add files with the spec prefix ie. `mytests_spec.rb` and make sure they always include the line `require 'spec_helper_system'` eg.:
+Within this file we can fine tune the behaviour of rspec-system, but more importantly we can use the before :suite rspec hook to provide setup tasks that must occur before all your tests.
+
+Create the directory `spec/system` in your project, its recommended to make sure your unit tests go into `spec/unit` instead so you can isolate them easily during test time. Add files with the spec prefix ie. `mytests_spec.rb` and make sure they always include the line `require 'spec_helper_system'`.
+
+An example file would look like this:
 
     require 'spec_helper_system'
 
     describe 'basics' do
       it 'should cat /etc/resolv.conf' do
-        system_run('cat /etc/resolv.conf') do |r|
+        system_run('cat /etc/hosts') do |r|
           r.stdout.should =~ /localhost/
+          r.exit_code.should be_zero
+          r.stderr.should be_empty
         end
       end
     end
@@ -52,7 +57,6 @@ Also consult the examples in the `examples` directory in the source of this libr
 
 For your reference, here are the list of custom rspec configuration items that can be overriden in your `spec_helper_system.rb` file:
 
-* *system_setup_block* - this accepts a proc that is called after node setup, but before every test (ie. before suite). The goal of this option is to provide a good place for node setup independant of tests.
 * *system_tmp* - For some of our activity, we require a temporary file area. By default we just a random temporary path, so you normally do not need to set this.
 
 Currently to get the nice formatting rspec-system specific formatter its recommended to use the Rake task, so add the following to your `Rakefile`:
@@ -68,14 +72,14 @@ A nodeset file outlines all the node configurations for your tests. The concept 
     ---
     default_set: 'centos-58-x64'
     sets:
-      'centos-58-x64':
+      'centos-59-x64':
         nodes:
           'main.vm':
-            prefab: 'centos-58-x64'
-      'debian-606-x64':
+            prefab: 'centos-59-x64'
+      'debian-607-x64':
         nodes:
           'main.vm':
-            prefab: 'debian-606-x64'
+            prefab: 'debian-607-x64'
 
 The file must adhere to the Kwalify schema supplied in `resources/kwalify-schemas/nodeset_schema.yml`.
 

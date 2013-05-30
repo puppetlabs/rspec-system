@@ -1,6 +1,12 @@
 require 'spec_helper_system'
 
 describe "system_run:" do
+  it 'check /tmp/setupblock to ensure before :suite executed' do
+    system_run('cat /tmp/setupblock') do |r|
+      r.stdout.should =~ /foobar/
+    end
+  end
+
   it "cat /etc/hosts" do
     system_run("cat /etc/hosts") do |r|
       r.exit_code.should == 0
@@ -66,5 +72,13 @@ describe "system_run:" do
     EOS
     r.stdout.should =~ /foo bar baz/
     r.exit_code.should == 0
+  end
+
+  context 'legacy tests' do
+    it 'cat /tmp/setupblockold to ensure the system_setup_block still works' do
+      system_run('cat /tmp/setupblockold') do |r|
+        r.stdout.should =~ /foobar/
+      end
+    end
   end
 end

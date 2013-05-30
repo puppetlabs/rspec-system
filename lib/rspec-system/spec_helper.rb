@@ -6,6 +6,8 @@ require 'yaml'
 require 'pp'
 require 'tempfile'
 
+include RSpecSystem::Helpers
+
 RSpec.configure do |c|
   include RSpecSystem::Log
   c.include RSpecSystem::Helpers
@@ -52,25 +54,35 @@ RSpec.configure do |c|
   def start_nodes
     ns = rspec_system_node_set
 
-    log.info "START RSPEC-SYSTEM SETUP"
-    log.info "Setname is: " + ns.setname
-    log.info "Configuration is: " + ns.config.pretty_inspect
-    log.info "Virtual Environment type is: #{ns.env_type}"
-    log.info "Default node is: #{ns.default_node.name}"
-    log.info "Destroy node is: #{ns.destroy}"
+    puts "Starting nodes"
+    puts
+    puts "Setname is: " + ns.setname
+    puts "Configuration is: " + ns.config.pretty_inspect
+    puts "Virtual Environment type is: #{ns.env_type}"
+    puts "Default node is: #{ns.default_node.name}"
+    puts "Destroy node is: #{ns.destroy}"
+    puts
 
     ns.setup
+
+    puts
+    puts "Finished starting nodes"
+    puts "================================================================="
   end
 
   def stop_nodes
-    log.info 'FINALIZE RSPEC-SYSTEM SETUP'
+    puts 'Stopping nodes'
+    puts
     rspec_system_node_set.teardown
+    puts 'Finished stopping nodes'
+    puts "================================================================="
   end
 
   def call_custom_setup_block
     # Run test specific setup routines
     if pr = RSpec.configuration.system_setup_block then
       log.info "Running custom setup block"
+      log.warn "The system_setup_block methodology will be deprecated in the next major release, use before :suite instead"
       pr.call
       log.info "Finished running custom setup block"
     end
@@ -92,6 +104,7 @@ RSpec.configure do |c|
   end
 
   c.after :suite do
+    puts "================================================================="
     # After Suite exceptions get captured it seems
     begin
       stop_nodes
