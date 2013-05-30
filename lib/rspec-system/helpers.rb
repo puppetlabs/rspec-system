@@ -15,60 +15,63 @@ require 'rspec-system/result'
 #
 # And Actions:
 #
-# * +system_run+ - runs a command on a node
-# * +system_rcp+ - remote copies to a node
+# * +shell+ - runs a command on a node
+# * +rcp+ - remote copies to a node
 #
-# @example Using run within your tests
-#   describe 'test running' do
-#     it 'run cat' do
-#       system_run 'cat /etc/resolv.conf' do |r|
-#         r.exit_code.should == 0
-#         r.stdout.should =~ /localhost/
-#       end
-#     end
-#   end
-# @example Using rcp in your tests
-#   describe 'test running' do
-#     it 'copy my files' do
-#       system_rcp :sp => 'mydata', :dp => '/srv/data'.should be_true
-#     end
-#   end
 # @example Using node in your tests
 #   describe 'test running' do
 #     it 'do something if redhat' do
-#       if system_node.facts['operatingsystem'] == 'RedHat' do
-#         system_run 'cat /etc/redhat-release'
+#       if node.facts['operatingsystem'] == 'RedHat' do
+#         shell 'cat /etc/redhat-release'
 #       end
 #     end
 #   end
 # @example Make your own helper
 #   describe 'my own helper' do
 #     def install_puppet
-#       facts = system_node.facts
+#       facts = node.facts
 #
 #       # Grab PL repository and install PL copy of puppet
 #       if facts['osfamily'] == 'RedHat'
-#         system_run('rpm -ivh http://yum.puppetlabs.com/el/5/products/i386/puppetlabs-release-5-6.noarch.rpm')
-#         system_run('yum install -y puppet')
+#         shell 'rpm -ivh http://yum.puppetlabs.com/el/5/products/i386/puppetlabs-release-5-6.noarch.rpm'
+#         shell 'yum install -y puppet'
 #       elsif facts['osfamily'] == 'Debian'
-#         system_run("wget http://apt.puppetlabs.com/puppetlabs-release-#{facts['lsbdistcodename']}.deb")
-#         system_run("dpkg -i puppetlabs-release-#{facts['lsbdistcodename']}.deb")
-#         system_run('apt-get update')
-#         system_run('apt-get install -y puppet')
+#         shell "wget http://apt.puppetlabs.com/puppetlabs-release-#{facts['lsbdistcodename']}.deb"
+#         shell "dpkg -i puppetlabs-release-#{facts['lsbdistcodename']}.deb"
+#         shell 'apt-get update'
+#         shell 'apt-get install -y puppet'
 #       end
 #     end
 #
 #     it 'test installing latest puppet' do
 #       install_puppet
-#       system_run('puppet apply --version') do |r|
-#         r.exit_code == 0
+#       shell 'puppet apply --version' do |r|
+#         r.exit_code.should be_zero
 #         r.stdout.should =~ /3.1/
-#         r.stderr.should == ''
+#         r.stderr.should be_empty
 #       end
 #     end
 #   end
 module RSpecSystem::Helpers
   # @!group Actions
+
+  # @!macro shell_method
+  #   @api public
+  #   @overload $0(options)
+  #     @param options [Hash] options for command execution
+  #     @option options [String] :command command to execute. Mandatory.
+  #     @option options [String] :c alias for :command
+  #     @option options [RSpecSystem::Node] :node (defaults to what was defined
+  #       default in your YAML file, otherwise if there is only one node it uses
+  #       that) specifies node to execute command on.
+  #     @option options [RSpecSystem::Node] :n alias for :node
+  #   @overload $0(command)
+  #     @param command [String] command to execute
+  #   @yield [result] yields result when called as a block
+  #   @yieldparam result [RSpecSystem::Result] result of run containing
+  #     :exit_code, :stdout and :stderr
+  #   @return [RSpecSystem::Result] result of run containing :exit_code,
+  #     :stdout and :stderr
 
   # Runs a shell command on a test host.
   #
@@ -85,20 +88,29 @@ module RSpecSystem::Helpers
   # to worry about that.
   #
   # @api public
-  # @param options [Hash, String] options for command execution, if passed a
-  #   string it will just use that for the command instead as a convenience.
-  # @option options [String] :command command to execute. Mandatory.
-  # @option options [String] :c alias for :command
-  # @option options [RSpecSystem::Node] :node (defaults to what was defined
-  #   default in your YAML file, otherwise if there is only one node it uses
-  #   that) specifies node to execute command on.
-  # @option options [RSpecSystem::Node] :n alias for :node
-  # @yield [result] yields result when called as a block
-  # @yieldparam result [RSpecSystem::Result] a result containing :exit_code,
-  #   :stdout and :stderr
-  # @return [RSpecSystem::Result] a result containing :exit_code, :stdout and
-  #   :stderr
-  def system_run(options)
+  # @macro shell_method
+  # @example Using it as a helper
+  #   it 'test a command' do
+  #     shell 'cat /etc/hosts' do |r|
+  #       # Test stdout contains 'localhost'
+  #       r.stdout.should =~ /localhost/
+  #       # Test stderr is empty
+  #       r.stderr.should == ''
+  #       # Test exit_code is 0
+  #       r.exit_code.should == 0
+  #     end
+  #   end
+  # @example Running arbitrary commands
+  #   it 'run some commands' do
+  #     # Run a command without testing results
+  #     shell 'echo "foobar" > /tmp/foo'
+  #
+  #     # Now we try to cat the file, and make sure it worked
+  #     shell 'cat /tmp/foo' do |r|
+  #       r.stdout.should =~ /foobar/
+  #     end
+  #   end
+  def shell(options, &block)
     ns = rspec_system_node_set
     dn = ns.default_node
 
@@ -117,7 +129,7 @@ module RSpecSystem::Helpers
     }.merge(options)
 
     if options[:c].nil?
-      raise "Cannot use system_run with no :command option"
+      raise "Cannot use shell with no :command option"
     end
 
     result = RSpecSystem::Result.new(ns.run(options))
@@ -129,7 +141,32 @@ module RSpecSystem::Helpers
     end
   end
 
-  # Remotely copy files to a test node
+  # Legacy method for running a shell command.
+  #
+  # @deprecated Use {#shell} instead
+  # @macro shell_method
+  def system_run(options, &block)
+    log.warn('system_run is deprecated, use shell instead')
+
+    shell(options, &block)
+  end
+
+  # @!macro rcp_method
+  #   @param options [Hash] options for command execution
+  #   @option options [String] :source_path source to copy files from (currently
+  #      only locally)
+  #   @option options [String] :sp alias for source_path
+  #   @option options [String] :destination_path destination for copy
+  #   @option options [String] :dp alias for dest_path
+  #   @option options [RSpecSystem::Node] :destination_node (default_node) destination node
+  #     to transfer files to. Optional.
+  #   @option options [RSpecSystem::Node] :d alias for destination_node
+  #   @option options [RSpecSystem::Node] :source_node ('') Reserved
+  #     for future use. Patches welcome.
+  #   @option options [RSpecSystem::Node] :s alias for source_node
+  #   @return [Bool] returns true if successful
+
+  # Remotely copy files to a test host
   #
   # Just specify a source path, destination path, and optionally a destination
   # node (if the default isn't enough) and go.
@@ -138,20 +175,14 @@ module RSpecSystem::Helpers
   # node provider, however this abstraction should mean you shouldn't need
   # to worry about that.
   #
-  # @param options [Hash] options for command execution
-  # @option options [String] :source_path source to copy files from (currently
-  #    only locally)
-  # @option options [String] :sp alias for source_path
-  # @option options [String] :destination_path destination for copy
-  # @option options [String] :dp alias for dest_path
-  # @option options [RSpecSystem::Node] :destination_node (default_node) destination node 
-  #   to transfer files to. Optional.
-  # @option options [RSpecSystem::Node] :d alias for destination_node
-  # @option options [RSpecSystem::Node] :source_node ('') Reserved
-  #   for future use. Patches welcome.
-  # @option options [RSpecSystem::Node] :s alias for source_node
-  # @return [Bool] returns true if successful
-  def system_rcp(options)
+  # @macro rcp_method
+  # @example Copying a path remotely
+  #   describe 'test running' do
+  #     it 'copy my files' do
+  #       rcp :sp => 'mydata', :dp => '/srv/data'.should be_true
+  #     end
+  #   end
+  def rcp(options)
     ns = rspec_system_node_set
     options = {
       :source_path => options[:sp],
@@ -168,21 +199,33 @@ module RSpecSystem::Helpers
     sp = options[:sp]
     dp = options[:dp]
 
-    log.info("system_rcp from #{sp} to #{d.name}:#{dp} executed")
+    log.info("rcp from #{sp} to #{d.name}:#{dp} executed")
     ns.rcp(options)
   end
 
+  # Legacy method for copying a file to a test host
+  #
+  # @deprecated Use {#rcp} instead
+  # @macro rcp_method
+  def system_rcp(options)
+    log.warn('system_rcp is deprecated, use rcp instead')
+    rcp(options)
+  end
+
   # @!group Queries
+
+  # @!macro node_method
+  #   @param options [Hash] search criteria
+  #   @option options [String] :name the canonical name of the node
+  #   @return [RSpecSystem::Node] node object
 
   # Returns a particular node object from the current nodeset given a set of
   # criteria.
   #
   # If no options are supplied, it tries to return the default node.
   #
-  # @param options [Hash] search criteria
-  # @option options [String] :name the canonical name of the node
-  # @return [RSpecSystem::Node] node object
-  def system_node(options = {})
+  # @macro node_method
+  def node(options = {})
     ns = rspec_system_node_set
     options = {
       :name => ns.default_node.name,
@@ -195,5 +238,14 @@ module RSpecSystem::Helpers
     else
       return ns.nodes[name]
     end
+  end
+
+  # Legacy method for querying nodes
+  #
+  # @deprecated Use {#node} instead
+  # @macro node_method
+  def system_node(options = {})
+    log.warn('system_node is deprecated, use node instead')
+    node(options)
   end
 end
