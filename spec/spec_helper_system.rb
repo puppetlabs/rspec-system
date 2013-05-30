@@ -14,13 +14,13 @@ RSpec.configure do |c|
   c.include ::LocalHelpers
 
   c.before :suite do
-    system_run 'echo foobar > /tmp/setupblock'
+    shell 'echo foobar > /tmp/setupblock'
   end
 
   # NOTE: this is deprecated, but we do this for legacy testing purposes
   # with the next major release we should remove this capability, and remove
   # the test. Do not use this in your own tests any more!
   c.system_setup_block = proc do
-    system_run 'echo foobar > /tmp/setupblockold'
+    shell 'echo foobar > /tmp/setupblockold'
   end
 end

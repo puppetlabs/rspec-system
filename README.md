@@ -31,7 +31,7 @@ Start by creating a helper file in `spec/spec_helper_system.rb` containing somet
     RSpec.configure do |c|
       c.before :suite do
         # Insert some setup tasks here
-        system_run('yum install -y ntp')
+        shell 'yum install -y ntp'
       end
     end
 
@@ -45,7 +45,7 @@ An example file would look like this:
 
     describe 'basics' do
       it 'should cat /etc/resolv.conf' do
-        system_run('cat /etc/hosts') do |r|
+        shell 'cat /etc/hosts' do |r|
           r.stdout.should =~ /localhost/
           r.exit_code.should be_zero
           r.stderr.should be_empty
@@ -70,7 +70,7 @@ That will setup the `spec:system` rake task.
 A nodeset file outlines all the node configurations for your tests. The concept here is to define one or more 'nodesets' each nodeset containing one or more 'nodes'. Create the file in your projects root directory as `.nodeset.yml`.
 
     ---
-    default_set: 'centos-58-x64'
+    default_set: 'centos-59-x64'
     sets:
       'centos-59-x64':
         nodes:
@@ -98,7 +98,7 @@ Prefabs are designed to be generic across different hosting environments. For ex
 
 For this reason there are various `provider_specific` settings that apply to different provider types. For now though, only `vagrant` specific settings are provided.
 
-`facts` in the prefab are literally dumps of `facter -p` on the host stored in the prefab file so you can look them up without addressing the machine. These are accessed using the `system_node#facts` method on the helper results and can be used in conditional logic during test runs and setup tasks. Not all the facts are supplied, only the more interesting ones.
+`facts` in the prefab are literally dumps of `facter -p` on the host stored in the prefab file so you can look them up without addressing the machine. These are accessed using the `node#facts` method on the helper results and can be used in conditional logic during test runs and setup tasks. Not all the facts are supplied, only the more interesting ones.
 
 #### Custom Prefabs
 
@@ -218,7 +218,7 @@ I want to start an eco-system of plugins for rspec-system, but do it in a sane w
 
 * node providers - that is, abstractions around other virtualisation, cloud or system tools. Right now a NodeSet is tied to a virtual type, but I think this isn't granual enough. Some ideas for future providers are:
     * blimpy - for firing up EC2 and OpenStack nodes, useful for Jenkins integration
-    * vmware vsphere - for those who have VMWare vSphere deployed already, this would be an awesome bonus.
+    * vmware fusion - for using vmware fusion with vagrant
     * razor - for launching bare metail nodes for testing purposes. Could be really useful to have baremetal tests for software that needs it like `facter`.
     * manual - not everything has to be 'launched' I can see a need for defining a static configuration for older machines that can't be poked and peeked. Of course, we might need to add cleanup tasks for this case.
 * helper libraries - libraries that provide test helpers, and setup helpers for testing development on the software in question.
