@@ -1,3 +1,18 @@
+1.6.0
+=====
+
+This minor feature release now adds test counts to the rspec-system formatter, for example:
+
+    Running test: 21 of 22
+
+So you can see mid-flight where the testing is up to.
+
+#### Detailed Changes
+
+* Present test count in formatter (Ken Barber)
+
+-------------------------------
+
 1.5.0
 =====
 
