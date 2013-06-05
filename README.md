@@ -22,6 +22,8 @@ Then installing with:
 
     bundle install --path vendor
 
+If your using git, add `.rspec_system` to your project's `.gitignore` file.  This is the default location for files created by rspec-system.
+
 ### Writing tests
 
 Start by creating a helper file in `spec/spec_helper_system.rb` containing something like the following:
@@ -165,12 +167,17 @@ Instead of switches, we use a number of environment variables to modify the beha
 * *RSPEC_VIRTUAL_ENV* - set this to `vagrant` if you wish, for now `vagrant` is the default so this is optional.
 * *RSPEC_SET* - the set to use when running tests (defaults to the `default_set` setting in the projects `.nodeset.yml` file). This string must align with the entries under `sets` in your `.nodeset.yml`.
 * *RSPEC_DESTROY* - set this to `no` if you do not want the VM to be destroyed before or after a test completes.  May be useful during initial testing of rspec tests to allow inspection of the VM.
+* *RSPEC_SYSTEM_TMP* - Sets the path to create vagrant_projects directory containing each Nodeset's Vagrantfile.  Default is the directory `.rspec_system` in your projects root.
 
 So if you wanted to run an alternate nodeset you could use:
 
     RSPEC_SET=fedora18 rake spec:system
 
 In Jenkins you should be able to use RSPEC\_SET in a test matrix, thus obtaining quite a nice integration and visual display of nodesets in Jenkins.
+
+To set the location of the Nodeset's Vagrantfile to `/tmp/vagrant_projects/centos-64-x64` you could use:
+
+    RSPEC_SET=centos-64-x64 RSPEC_SYSTEM_TMP=/tmp rake spec:system
 
 #### VSphere Provider
 

@@ -27,6 +27,12 @@ RSpec.configure do |c|
   def custom_prefabs_path
     File.expand_path(File.join(File.basename(__FILE__), '..', '.prefabs.yml'))
   end
+  
+  def rspec_system_tmp
+    path = ENV["RSPEC_SYSTEM_TMP"] || File.expand_path(File.join(File.basename(__FILE__), '..', '.rspec_system'))
+    FileUtils.mkdir_p(path)
+    path
+  end
 
   def rspec_system_config
     YAML.load_file('.nodeset.yml')
@@ -89,7 +95,7 @@ RSpec.configure do |c|
   end
 
   # Default the system_tmp dir to something random
-  c.system_tmp = Dir.mktmpdir
+  c.system_tmp = rspec_system_tmp
 
   c.before :suite do
     # Before Suite exceptions get captured it seems
