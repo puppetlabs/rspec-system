@@ -10,7 +10,11 @@ module RSpecSystem
     attr_reader :nodes
     attr_reader :destroy
 
+    # @!group Abstract Methods
+
     # Create new NodeSet, populating necessary data structures.
+    #
+    # @abstract override for providing global storage and setup-level code
     def initialize(setname, config, custom_prefabs_path, options)
       @setname = setname
       @config = config
@@ -24,24 +28,43 @@ module RSpecSystem
     end
 
     # Setup the NodeSet by starting all nodes.
+    #
+    # @return [void]
+    # @abstract Override this method and provide your own node launching code
     def setup
       raise "Unimplemented method #setup"
     end
 
     # Shutdown the NodeSet by shutting down or pausing all nodes.
+    #
+    # @return [void]
+    # @abstract Override this method and provide your own node teardown code
     def teardown
       raise "Unimplemented method #teardown"
     end
 
     # Run a command on a host in the NodeSet.
+    #
+    # @param opts [Hash] options hash containing :n (node) and :c (command)
+    # @return [Hash] a hash containing :stderr, :stdout and :exit_code
+    # @abstract Override this method providing your own shell running code
     def run(options)
       raise "Unimplemented method #run"
     end
 
     # Copy a file to the host in the NodeSet.
+    #
+    # @param opts [Hash] options
+    # @option opts [RSpecHelper::Node] :d destination node
+    # @option opts [String] :sp source path
+    # @option opts [String] :dp destination path
+    # @return [Boolean] returns true if command succeeded, false otherwise
+    # @abstract Override this method providing your own file transfer code
     def rcp(options)
       raise "Unimplemented method #rcp"
     end
+
+    # @!group Common Methods
 
     # Return environment type
     def env_type
