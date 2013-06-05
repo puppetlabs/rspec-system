@@ -22,6 +22,7 @@ module RSpecSystem
     # @param count [Fixnum] number of tests to run
     # @return [void]
     def start(count)
+      @max_tests = count
       super(count)
       output << "=================================================================\n\n"
       output << bold("Commencing rspec-system tests\n")
@@ -35,7 +36,8 @@ module RSpecSystem
     def example_started(example)
       super(example)
       output << "=================================================================\n\n"
-      output << bold("Running test:\n  ") << color(example.full_description, :magenta) << "\n\n"
+      output << bold("Running test: ") << "#{next_index} of #{@max_tests}" << "\n"
+      output << bold("Description:\n  ") << color(example.full_description, :magenta) << "\n\n"
     end
 
     # Display output when an example has passed
@@ -66,7 +68,6 @@ module RSpecSystem
       super(example)
       msg = example.execution_result[:exception]
       output << "\n" << bold('Result: ') << failure_color('failed') << "\n"
-      output << bold("Index: ") << "#{next_failure_index}\n"
       output << bold("Reason:\n") << "#{msg}\n\n"
     end
 
@@ -74,9 +75,9 @@ module RSpecSystem
     #
     # @api private
     # @return [Fixnum] index #
-    def next_failure_index
-      @next_failure_index ||= 0
-      @next_failure_index += 1
+    def next_index
+      @next_index ||= 0
+      @next_index += 1
     end
   end
 end
