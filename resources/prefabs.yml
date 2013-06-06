@@ -203,3 +203,24 @@
       box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/sles-11sp1-x64-vbox4210-nocm.box'
     vsphere:
       template: 'sles-11-x86_64'
+'ubuntu-1210-docker':
+  description: ""
+  facts:
+    architecture: amd64
+    facterversion: "1.6.18"
+    kernel: Linux
+    kernelmajversion: "3.8"
+    kernelrelease: "3.8.0-19-generic"
+    kernelversion: "3.8.0"
+    lsbdistcodename: quantal
+    lsbdistdescription: "Ubuntu 12.10"
+    lsbdistid: Ubuntu
+    lsbdistrelease: "12.10"
+    lsbmajdistrelease: "12"
+    operatingsystem: Ubuntu
+    operatingsystemrelease: "12.10"
+    osfamily: Debian
+    rubyversion: "1.8.7"
+  provider_specifics:
+    docker:
+      image: 'base'
