@@ -1,3 +1,16 @@
+1.7.0
+=====
+
+This change adjusts the temporary path for vagrant projects to use a directory in your project `.rspec_system`. This way while debugging issues on your VM you do not need to scroll back to find the vagrant project, simply look in the local `.rspec_system`.
+
+Now if you want to adjust this base directory to something else, you can use the directory RSPEC_SYSTEM_TMP.
+
+#### Detailed Changes
+
+* Change the tmp path for the vagrant_projects directory to be under projects root directory (Trey Dock)
+
+-------------------------------
+
 1.6.0
 =====
 
