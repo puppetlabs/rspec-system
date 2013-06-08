@@ -48,7 +48,7 @@ module RSpecSystem
     # @param opts [Hash] options hash containing :n (node) and :c (command)
     # @return [Hash] a hash containing :stderr, :stdout and :exit_code
     # @abstract Override this method providing your own shell running code
-    def run(options)
+    def run(opts)
       raise "Unimplemented method #run"
     end
 
@@ -60,7 +60,7 @@ module RSpecSystem
     # @option opts [String] :dp destination path
     # @return [Boolean] returns true if command succeeded, false otherwise
     # @abstract Override this method providing your own file transfer code
-    def rcp(options)
+    def rcp(opts)
       raise "Unimplemented method #rcp"
     end
 
