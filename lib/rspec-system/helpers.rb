@@ -207,9 +207,9 @@ module RSpecSystem::Helpers
   #
   # @deprecated Use {#rcp} instead
   # @macro rcp_method
-  def system_rcp(options)
+  def system_rcp(options, &block)
     log.warn('system_rcp is deprecated, use rcp instead')
-    rcp(options)
+    rcp(options, &block)
   end
 
   # @!group Queries

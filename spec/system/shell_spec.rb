@@ -14,6 +14,12 @@ describe "shell:" do
     end
   end
 
+  it 'ensure it can be used outside a block' do
+    shell 'echo foobar > /tmp/foobarbaz'
+    r = shell 'cat /tmp/foobarbaz'
+    r.stdout.should =~ /foobar/
+  end
+
   it "cat /etc/hosts - test results using hash method" do
     shell "cat /etc/hosts" do |r|
       r[:exit_code].should be_zero
