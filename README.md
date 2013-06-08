@@ -49,17 +49,13 @@ An example file would look like this:
       it 'should cat /etc/resolv.conf' do
         shell 'cat /etc/hosts' do |r|
           r.stdout.should =~ /localhost/
-          r.exit_code.should be_zero
           r.stderr.should be_empty
+          r.exit_code.should be_zero
         end
       end
     end
 
 Also consult the examples in the `examples` directory in the source of this library for more details.
-
-For your reference, here are the list of custom rspec configuration items that can be overriden in your `spec_helper_system.rb` file:
-
-* *system_tmp* - For some of our activity, we require a temporary file area. By default we just a random temporary path, so you normally do not need to set this.
 
 Currently to get the nice formatting rspec-system specific formatter its recommended to use the Rake task, so add the following to your `Rakefile`:
 
