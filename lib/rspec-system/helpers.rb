@@ -140,7 +140,9 @@ module RSpecSystem::Helpers
   # @option options [RSpecSystem::Node] :source_node ('') Reserved
   #   for future use. Patches welcome.
   # @option options [RSpecSystem::Node] :s alias for source_node
-  # @return [Bool] returns true if successful
+  # @yield [result] yields result when called as a block
+  # @yieldparam result [RSpecSystem::Helpers::Rcp] result of rcp
+  # @return [RSpecSystem::Helpers::Rcp] result of rcp
   # @example Copying a path remotely
   #   describe 'test running' do
   #     it 'copy my files' do
