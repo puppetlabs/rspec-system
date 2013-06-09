@@ -58,20 +58,6 @@ module RSpecSystem::Helpers
   # @!group Actions
 
   # @!macro shell_method
-  #   @api public
-  #   @overload $0(options)
-  #     @param options [Hash] options for command execution
-  #     @option options [String] :command command to execute. Mandatory.
-  #     @option options [String] :c alias for :command
-  #     @option options [RSpecSystem::Node] :node (defaults to what was defined
-  #       default in your YAML file, otherwise if there is only one node it uses
-  #       that) specifies node to execute command on.
-  #     @option options [RSpecSystem::Node] :n alias for :node
-  #   @overload $0(command)
-  #     @param command [String] command to execute
-  #   @yield [result] yields result when called as a block
-  #   @yieldparam result [RSpecSystem::Helpers::Shell] result of run
-  #   @return [RSpecSystem::Helpers::Shell] result of run
 
   # Runs a shell command on a test host.
   #
@@ -88,7 +74,20 @@ module RSpecSystem::Helpers
   # to worry about that.
   #
   # @api public
-  # @macro shell_method
+  # @api public
+  # @overload $0(options)
+  #   @param options [Hash] options for command execution
+  #   @option options [String] :command command to execute. Mandatory.
+  #   @option options [String] :c alias for :command
+  #   @option options [RSpecSystem::Node] :node (defaults to what was defined
+  #     default in your YAML file, otherwise if there is only one node it uses
+  #     that) specifies node to execute command on.
+  #   @option options [RSpecSystem::Node] :n alias for :node
+  # @overload $0(command)
+  #   @param command [String] command to execute
+  # @yield [result] yields result when called as a block
+  # @yieldparam result [RSpecSystem::Helpers::Shell] result of run
+  # @return [RSpecSystem::Helpers::Shell] result of run
   # @example Using it as a helper
   #   it 'test a command' do
   #     shell 'cat /etc/hosts' do |r|
@@ -120,31 +119,6 @@ module RSpecSystem::Helpers
     RSpecSystem::Helpers::Shell.new(options, self, &block)
   end
 
-  # Legacy method for running a shell command.
-  #
-  # @deprecated Use {#shell} instead
-  # @macro shell_method
-  def system_run(options, &block)
-    log.warn('system_run is deprecated, use shell instead')
-
-    shell(options, &block)
-  end
-
-  # @!macro rcp_method
-  #   @param options [Hash] options for command execution
-  #   @option options [String] :source_path source to copy files from (currently
-  #      only locally)
-  #   @option options [String] :sp alias for source_path
-  #   @option options [String] :destination_path destination for copy
-  #   @option options [String] :dp alias for dest_path
-  #   @option options [RSpecSystem::Node] :destination_node (default_node) destination node
-  #     to transfer files to. Optional.
-  #   @option options [RSpecSystem::Node] :d alias for destination_node
-  #   @option options [RSpecSystem::Node] :source_node ('') Reserved
-  #     for future use. Patches welcome.
-  #   @option options [RSpecSystem::Node] :s alias for source_node
-  #   @return [Bool] returns true if successful
-
   # Remotely copy files to a test host
   #
   # Just specify a source path, destination path, and optionally a destination
@@ -154,7 +128,21 @@ module RSpecSystem::Helpers
   # node provider, however this abstraction should mean you shouldn't need
   # to worry about that.
   #
-  # @macro rcp_method
+  # @param options [Hash] options for command execution
+  # @option options [String] :source_path source to copy files from (currently
+  #    only locally)
+  # @option options [String] :sp alias for source_path
+  # @option options [String] :destination_path destination for copy
+  # @option options [String] :dp alias for dest_path
+  # @option options [RSpecSystem::Node] :destination_node (default_node) destination node
+  #   to transfer files to. Optional.
+  # @option options [RSpecSystem::Node] :d alias for destination_node
+  # @option options [RSpecSystem::Node] :source_node ('') Reserved
+  #   for future use. Patches welcome.
+  # @option options [RSpecSystem::Node] :s alias for source_node
+  # @yield [result] yields result when called as a block
+  # @yieldparam result [RSpecSystem::Helpers::Rcp] result of rcp
+  # @return [RSpecSystem::Helpers::Rcp] result of rcp
   # @example Copying a path remotely
   #   describe 'test running' do
   #     it 'copy my files' do
@@ -165,28 +153,16 @@ module RSpecSystem::Helpers
     RSpecSystem::Helpers::Rcp.new(options, self, &block)
   end
 
-  # Legacy method for copying a file to a test host
-  #
-  # @deprecated Use {#rcp} instead
-  # @macro rcp_method
-  def system_rcp(options, &block)
-    log.warn('system_rcp is deprecated, use rcp instead')
-    rcp(options, &block)
-  end
-
   # @!group Queries
-
-  # @!macro node_method
-  #   @param options [Hash] search criteria
-  #   @option options [String] :name the canonical name of the node
-  #   @return [RSpecSystem::Node] node object
 
   # Returns a particular node object from the current nodeset given a set of
   # criteria.
   #
   # If no options are supplied, it tries to return the default node.
   #
-  # @macro node_method
+  # @param options [Hash] search criteria
+  # @option options [String] :name the canonical name of the node
+  # @return [RSpecSystem::Node] node object
   def node(options = {})
     ns = rspec_system_node_set
     options = {
@@ -200,14 +176,5 @@ module RSpecSystem::Helpers
     else
       return ns.nodes[name]
     end
-  end
-
-  # Legacy method for querying nodes
-  #
-  # @deprecated Use {#node} instead
-  # @macro node_method
-  def system_node(options = {})
-    log.warn('system_node is deprecated, use node instead')
-    node(options)
   end
 end
