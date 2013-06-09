@@ -6,3 +6,4 @@ doc/
 vendor/
 .bundle
 spec/reports/
+.rspec_system/

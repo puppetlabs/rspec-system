@@ -80,6 +80,39 @@ describe "shell:" do
     r.exit_code.should be_zero
   end
 
+  describe 'use in subject' do
+    context shell 'cat /etc/hosts' do
+      its(:stdout) { should =~ /localhost/ }
+      its(:exit_code) { should be_zero }
+      its(:stderr) { should be_empty }
+    end
+  end
+
+  context 'should not be lazy in a before :each block' do
+    before :each do
+      shell('echo foobarbaz > /tmp/eachblock')
+    end
+    context shell 'cat /tmp/eachblock' do
+      its(:stdout) { should =~ /foobarbaz/ }
+    end
+  end
+
+  context 'should not be lazy in a before inside its own context' do
+    context shell 'cat /tmp/eachblock2' do
+      before :each do
+        shell('echo foobarbaz > /tmp/eachblock2')
+      end
+      its(:stdout) { should =~ /foobarbaz/ }
+    end
+  end
+
+  it 'should be able to make shell lazy' do
+    shell(:c => 'echo foobarbaz > /tmp/forcelazy', :lazy => true)
+    shell 'cat /tmp/forcelazy' do |r|
+      r.stdout.should be_empty
+    end
+  end
+
   context 'legacy tests' do
     it 'cat /etc/hosts - test results using hash method' do
       shell 'cat /etc/hosts' do |r|
@@ -94,11 +127,22 @@ describe "shell:" do
         r.stdout.should =~ /localhost/
       end
     end
-
-    it 'cat /tmp/setupblockold to ensure the system_setup_block still works' do
-      shell 'cat /tmp/setupblockold' do |r|
-        r.stdout.should =~ /foobar/
-      end
-    end
   end
+end
+
+# Test as a top-level subject
+describe shell('cat /etc/hosts') do
+  its(:stdout) { should =~ /localhost/ }
+  its(:stderr) { should be_empty }
+  its(:exit_code) { should be_zero }
+end
+
+# Test as an explicit subject, this is a bad example but put here for complete-
+# ness. The problem is that the subject will get called each time, so its not
+# recommended to use it ths way.
+describe 'cat /etc/hosts' do
+  subject { shell('cat /etc/hosts') }
+  its(:stdout) { should =~ /localhost/ }
+  its(:stderr) { should be_empty }
+  its(:exit_code) { should be_zero }
 end
