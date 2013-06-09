@@ -27,20 +27,4 @@ describe "rcp:" do
       r.stdout.should =~ /Test content 1234/
     end
   end
-
-  context 'legacy tests' do
-    it 'check system_rcp works' do
-      system_rcp(
-        :sp => fixture_root + 'example_dir',
-        :dp => '/tmp/example_destination3'
-      ) do |r|
-        r.success.should be_true
-      end
-
-      shell 'cat /tmp/example_destination3/example_file' do |r|
-        r.exit_code.should be_zero
-        r.stdout.should =~ /Test content 1234/
-      end
-    end
-  end
 end

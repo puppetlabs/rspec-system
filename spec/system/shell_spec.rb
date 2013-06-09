@@ -120,13 +120,6 @@ describe "shell:" do
         r[:stdout].should =~ /localhost/
       end
     end
-
-    it 'cat /etc/hosts - using system_run' do
-      system_run 'cat /etc/hosts' do |r|
-        r.exit_code.should be_zero
-        r.stdout.should =~ /localhost/
-      end
-    end
   end
 end
 
