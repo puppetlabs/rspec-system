@@ -1,6 +1,10 @@
+require 'rspec-system'
+
 module RSpecSystem
   # This class represents a node in a nodeset
   class Node
+    include RSpecSystem::InternalHelpers
+
     # Static helper for generating a node direct from the hash returned by
     # the nodeset YAML file.
     #
@@ -76,6 +80,20 @@ module RSpecSystem
     # @return [Hash] provider specific settings
     def provider_specifics
       @provider_specifics
+    end
+
+    # Return name when stringified
+    #
+    # @return [String] name of node
+    def to_s
+      name
+    end
+
+    # Return name when inspected
+    #
+    # @return [String] name of node
+    def inspect
+      name
     end
   end
 end
