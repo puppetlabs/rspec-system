@@ -1,3 +1,53 @@
+2.0.0
+=====
+
+This major release adds some syntactical sugar, providing the user with the ability to use helpers in subjects.
+
+So for example, where before you could use `shell` as a helper:
+
+    describe 'shell tests' do
+      it 'test 1' do
+        shell('cat /etc/hosts') do |r|
+          r.stdout.should =~ /localhost/
+          r.stderr.should be_empty
+          r.exit_code.should be_zero
+        end
+      end
+    end
+
+Now you can use it as the subject of a `describe` or `context`:
+
+    describe 'shell tests' do
+      context shell 'cat /etc/hosts' do
+        its(:stdout) { should =~ /localhost/ }
+        its(:stderr) { should be_empty }
+        its(:exit_code) { should be_zero }
+      end
+    end
+
+The helper `rcp` has also been modified to benefit from this change:
+
+    describe 'rcp tests' do
+      context rcp :dp => '/tmp/foo', :sp => '/tmp/foo' do
+        its(:success) { should be_true }
+      end
+    end
+
+The fact that you can use the helpers in both places should provide the user with greater flexibility to create more succinct tests, while still providing simple sequences of commands in a single test when needed as before.
+
+This facility is also available to other plugins by providing a new `RSpecSystem::Helper` object that can be extended to provide a new helper with all the syntactic sugar features as the core methods `shell` and `rcp`.
+
+As part of this release, we have also removed some prior deprecations:
+
+* The system_* methods no longer work: system_run, system_rcp and system_node
+* system_setup_block no longer works.
+
+Before upgrading, we suggest you upgrade to 1.7.0, paying heed to any deprecation warnings before upgrading to 2.0.0.
+
+#### Detail Changes
+
+-------------------------------
+
 1.7.0
 =====
 
