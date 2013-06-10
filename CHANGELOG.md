@@ -46,6 +46,12 @@ Before upgrading, we suggest you upgrade to 1.7.0, paying heed to any deprecatio
 
 #### Detail Changes
 
+* Fix yarddoc for rcp (Ken Barber)
+* Remove deprecations in prep for 2 (Ken Barber)
+* More sugar through lazy helper object (Ken Barber)
+* Fix 2 yard errors (Ken Barber)
+* Minor improvements to tests and apidocs (Ken Barber)
+
 -------------------------------
 
 1.7.0
