@@ -16,10 +16,12 @@ Gem::Specification.new do |s|
 
   # Dependencies
   s.required_ruby_version = '>= 1.8.7'
-  s.add_runtime_dependency "rspec"
-  s.add_runtime_dependency "kwalify"
-  s.add_runtime_dependency "systemu"
+  s.add_runtime_dependency "rspec", '~>2.13'
+  s.add_runtime_dependency "kwalify", '~>0.7.2'
+  s.add_runtime_dependency "systemu", '~>2.5'
   s.add_runtime_dependency "net-ssh", '~>2.6'
-  s.add_runtime_dependency "net-scp"
-  s.add_runtime_dependency "rbvmomi"
+  s.add_runtime_dependency "net-scp", '~>1.1'
+  s.add_runtime_dependency "rbvmomi", '~>1.6'
+  # It seems 1.6.0 relies on ruby 1.9.2, so lets pin it for now
+  s.add_runtime_dependency "nokogiri", '~>1.5.9'
 end
