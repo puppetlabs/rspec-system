@@ -1,10 +1,5 @@
 # Include this file to create the spec:* rake tasks
 
-require 'rubygems'
-require "bundler/setup"
-
-Bundler.require :default, :test
-
 require 'rspec/core/rake_task'
 require 'rspec-system/formatter'
 

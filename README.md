@@ -20,9 +20,9 @@ However it is usually recommended to include it in your `Gemfile` and let bundle
 
 Then installing with:
 
-    bundle install --path vendor
+    bundle install --path vendor/bundle
 
-If your using git, add `.rspec_system` to your project's `.gitignore` file.  This is the default location for files created by rspec-system.
+If you're using git, add `.rspec_system` to your project's `.gitignore` file.  This is the default location for files created by rspec-system.
 
 ### Writing tests
 
@@ -92,7 +92,7 @@ The file must adhere to the Kwalify schema supplied in `resources/kwalify-schema
 * `sets`: Each set contains a series of nodes, and is given a unique name. You can create sets with only 1 node if you like.
 * `sets -> [setname] -> nodes`: Node definitions for a set. Each node needs a unique name so you can address each one individualy if you like.
 * `sets -> [setname] -> nodes -> [name] -> prefab`: This relates to the prefabricated node template you wish to use. Currently this is the only way to launch a node. Look in `resources/prefabs.yml` for more details.
-* `default_set`: this is the default set to run if none are provided with `rake spec:system`. This should be the most common platform normally.
+* `default_set`: this is the default set to run if none are provided with `bundle exec rake spec:system`. This should be the most common platform normally.
 
 ### Prefabs
 
@@ -162,7 +162,7 @@ Make sure you have already installed:
 
 Once these are ready, you can Run the system tests with:
 
-    rake spec:system
+    bundle exec rake spec:system
 
 The VM's should be downloaded from the internet, started and tests should run.
 
@@ -175,7 +175,7 @@ Instead of switches, we use a number of environment variables to modify the beha
 
 So if you wanted to run an alternate nodeset you could use:
 
-    RSPEC_SET=fedora18 rake spec:system
+    RSPEC_SET=fedora18 bundle exec rake spec:system
 
 In Jenkins you should be able to use RSPEC\_SET in a test matrix, thus obtaining quite a nice integration and visual display of nodesets in Jenkins.
 
@@ -203,7 +203,7 @@ This provider has a lot more options for setup, in the form of environment varia
 
 Set these variables, and run the usual rake command:
 
-    rake spec:system
+    bundle exec rake spec:system
 
 In Jenkins, set the authentication variables above using environment variable injection. I recommend using the private environment variables feature for user & pass however so these do not get displayed in the console output. As with the vagrant provider however, turn RSPEC\_SET into a test matrix, containing all the sets you want to test against.
 
@@ -269,10 +269,9 @@ The setup for a job is basically:
         set +e
     
         [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
-        rvm use ruby-2.0.0@some_unique_name_here --create
-    
-        bundle update
-        rake spec:system
+        rvm use ruby-2.0.0
+        bundle install --path vendor/bundle
+        bundle exec rake spec:system
 
 I went quite complex and had Github pull request integration working with this, and quite a few other nice features. If you need help setting it up get in touch.
 
@@ -297,7 +296,7 @@ The setup for a job is basically:
         set +e
         [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
         rvm use ruby-2.0.0
-        bundle install --vendor
+        bundle install --path vendor/bundle
         bundle exec rake spec:system
 
 Basically the results were quite nice, as apposed to the 'vagrant' provider I was able to achieve running parallel jobs using my matrix setup.
