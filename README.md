@@ -20,7 +20,7 @@ However it is usually recommended to include it in your `Gemfile` and let bundle
 
 Then installing with:
 
-    bundle install --path vendor
+    bundle install --path vendor/bundle
 
 If you're using git, add `.rspec_system` to your project's `.gitignore` file.  This is the default location for files created by rspec-system.
 
@@ -269,9 +269,8 @@ The setup for a job is basically:
         set +e
     
         [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
-        rvm use ruby-2.0.0@some_unique_name_here --create
-    
-        bundle update
+        rvm use ruby-2.0.0
+        bundle install --path vendor/bundle
         bundle exec rake spec:system
 
 I went quite complex and had Github pull request integration working with this, and quite a few other nice features. If you need help setting it up get in touch.
