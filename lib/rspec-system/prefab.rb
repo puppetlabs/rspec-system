@@ -1,6 +1,8 @@
 module RSpecSystem
   # This object represents a prefab definition from the prefabs.yml file
   class Prefab
+    extend RSpecSystem::Util
+
     attr_reader :name
     attr_reader :description
     attr_reader :facts
@@ -15,7 +17,7 @@ module RSpecSystem
       end
 
       prefabs = YAML.load_file(File.join(File.dirname(__FILE__), '..', '..', 'resources', 'prefabs.yml'))
-      prefabs.merge!(custom_prefabs)
+      deep_merge!(prefabs, custom_prefabs)
       raise "No such prefab" unless pf = prefabs[name]
 
       RSpecSystem::Prefab.new(

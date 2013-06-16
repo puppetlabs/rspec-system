@@ -23,4 +23,17 @@ module RSpecSystem::Util
 
     return str
   end
+
+  # This is based on the Hash#deep_merge! method from activesupport
+  #
+  # @param dest_hash [Hash] hash to save merged values into
+  # @param other_hash [Hash] hash to merge values from
+  # @return [Hash] dest_hash
+  def deep_merge!(dest_hash, other_hash)
+    other_hash.each_pair do |k,v|
+      tv = dest_hash[k]
+      dest_hash[k] = tv.is_a?(Hash) && v.is_a?(Hash) ? deep_merge!(tv.dup, v) : v
+    end
+    dest_hash
+  end
 end
