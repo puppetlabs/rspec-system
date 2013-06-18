@@ -1,3 +1,17 @@
+2.1.0
+=====
+
+This is a small feature release, that includes the ability for custom prefabs to be 'merged' with the inbuilt ones. This is a convenience, so that one can override the box definitions without having to also provide new Fact details (for example).
+
+#### Detailed Changes
+
+* Bundle exec should be used (Hunter Haugen)
+* Align bundler instructions based on @hunner previous patch (Ken Barber)
+* Perform deep merge of custom prefabs (Dominic Cleal)
+* Fix yard doc error for Helpers (Ken Barber)
+
+-------------------------------
+
 2.0.0
 =====
 
@@ -44,7 +58,7 @@ As part of this release, we have also removed some prior deprecations:
 
 Before upgrading, we suggest you upgrade to 1.7.0, paying heed to any deprecation warnings before upgrading to 2.0.0.
 
-#### Detail Changes
+#### Detailed Changes
 
 * Fix yarddoc for rcp (Ken Barber)
 * Remove deprecations in prep for 2 (Ken Barber)
