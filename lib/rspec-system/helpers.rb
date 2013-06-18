@@ -57,8 +57,6 @@ require 'rspec-system/helpers/rcp'
 module RSpecSystem::Helpers
   # @!group Actions
 
-  # @!macro shell_method
-
   # Runs a shell command on a test host.
   #
   # When invoked as a block a result hash is yielded to the block as a
@@ -73,9 +71,7 @@ module RSpecSystem::Helpers
   # node provider, however this abstraction should mean you shouldn't need
   # to worry about that.
   #
-  # @api public
-  # @api public
-  # @overload $0(options)
+  # @overload shell(options)
   #   @param options [Hash] options for command execution
   #   @option options [String] :command command to execute. Mandatory.
   #   @option options [String] :c alias for :command
@@ -83,7 +79,7 @@ module RSpecSystem::Helpers
   #     default in your YAML file, otherwise if there is only one node it uses
   #     that) specifies node to execute command on.
   #   @option options [RSpecSystem::Node] :n alias for :node
-  # @overload $0(command)
+  # @overload shell(command)
   #   @param command [String] command to execute
   # @yield [result] yields result when called as a block
   # @yieldparam result [RSpecSystem::Helpers::Shell] result of run
