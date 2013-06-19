@@ -1,6 +1,7 @@
 require 'rspec-system'
 require 'rspec-system/result'
 require 'rspec-system/internal_helpers'
+require 'timeout'
 
 module RSpecSystem
   # This class represents an abstract 'helper' object.
@@ -74,6 +75,7 @@ module RSpecSystem
       opts = {
         :node => opts[:n] || dn,
         :n => opts[:node] || dn,
+        :timeout => opts[:timeout] || 0,
         :lazy => lazy,
       }.merge(opts)
 
@@ -109,7 +111,14 @@ module RSpecSystem
     # @api private
     def result_data
       return rd unless rd.nil?
-      @rd = RSpecSystem::Result.new(execute)
+
+      begin
+        Timeout::timeout(opts[:timeout]) do
+          @rd = RSpecSystem::Result.new(execute)
+        end
+      rescue Timeout::Error => e
+        raise RSpecSystem::Exception::TimeoutError, e.message
+      end
     end
 
     # Refresh the data, re-running the action associated with this helper.

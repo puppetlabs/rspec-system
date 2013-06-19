@@ -79,6 +79,8 @@ module RSpecSystem::Helpers
   #     default in your YAML file, otherwise if there is only one node it uses
   #     that) specifies node to execute command on.
   #   @option options [RSpecSystem::Node] :n alias for :node
+  #   @option options [Fixnum] :timeout seconds of time to allow before timing
+  #     out. Defaults to 0 (not timeout).
   # @overload shell(command)
   #   @param command [String] command to execute
   # @yield [result] yields result when called as a block
@@ -136,6 +138,8 @@ module RSpecSystem::Helpers
   # @option options [RSpecSystem::Node] :source_node ('') Reserved
   #   for future use. Patches welcome.
   # @option options [RSpecSystem::Node] :s alias for source_node
+  # @option options [Fixnum] :timeout seconds of time to allow before timing
+  #   out. Defaults to 0 (no timeout).
   # @yield [result] yields result when called as a block
   # @yieldparam result [RSpecSystem::Helpers::Rcp] result of rcp
   # @return [RSpecSystem::Helpers::Rcp] result of rcp
