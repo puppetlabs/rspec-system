@@ -3,6 +3,7 @@ require 'rspec'
 # Root module namespace for +rspec-system+
 module RSpecSystem; end
 
+require 'rspec-system/exception'
 require 'rspec-system/util'
 require 'rspec-system/log'
 require 'rspec-system/helper'

@@ -121,6 +121,20 @@ describe "shell:" do
       end
     end
   end
+
+  describe 'timeouts' do
+    it 'should throw exception if the command times out' do
+      expect { shell(:c => 'sleep 2', :timeout => 1) }.to raise_error(RSpecSystem::Exception::TimeoutError, 'execution expired')
+    end
+
+    it 'should complete fine if command completed within timeout' do
+      shell(:c => 'sleep 1', :timeout => 5) do |r|
+        r.stdout.should == ''
+        r.stderr.should == ''
+        r.exit_code.should == 0
+      end
+    end
+  end
 end
 
 # Test as a top-level subject
