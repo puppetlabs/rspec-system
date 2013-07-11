@@ -1,3 +1,10 @@
+2.1.1
+=====
+
+This bug fix only adds lsb_* facts to the prefabs for: centos-64 and fedora-18
+
+-------------------------------
+
 2.1.0
 =====
 

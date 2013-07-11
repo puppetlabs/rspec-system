@@ -2,9 +2,9 @@
 Gem::Specification.new do |s|
   # Metadata
   s.name        = "rspec-system"
-  s.version     = "2.1.0"
+  s.version     = "2.1.1"
   s.authors     = ["Ken Barber"]
-  s.email       = ["ken@bob.sh"]
+  s.email       = ["info@puppetlabs.com"]
   s.homepage    = "https://github.com/puppetlabs/rspec-system"
   s.summary     = "System testing with rspec"
 
