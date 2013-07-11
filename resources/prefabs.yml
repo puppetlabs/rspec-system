@@ -80,6 +80,11 @@
     kernelversion: "2.6.32"
     operatingsystemrelease: "6.4"
     osfamily: RedHat
+    lsbmajdistrelease: "6"
+    lsbdistcodename: Final
+    lsbdistdescription: "CentOS release 6.4 (Final)"
+    lsbdistid: CentOS
+    lsbdistrelease: "6.4"
     kernel: Linux
     rubyversion: "1.8.7"
   provider_specifics:
@@ -99,6 +104,9 @@
     kernelrelease: 3.6.10-4.fc18.x86_64
     kernelversion: 3.6.10
     operatingsystemrelease: "18"
+    lsbdistid: Fedora
+    lsbmajdistrelease: "18"
+    lsbdistrelease: "18"
     osfamily: RedHat
     rubyversion: 1.9.3
   provider_specifics:
