@@ -1,6 +1,8 @@
 require 'rspec-system/result'
 require 'rspec-system/helpers/shell'
 require 'rspec-system/helpers/rcp'
+require 'rspec-system/helpers/snapshot'
+require 'rspec-system/helpers/revert'
 
 # This module contains the main rspec helpers that are to be used within
 # rspec-system tests. These are the meat-and-potatoes of your system tests,
@@ -151,6 +153,46 @@ module RSpecSystem::Helpers
   #   end
   def rcp(options, &block)
     RSpecSystem::Helpers::Rcp.new(options, self, &block)
+  end
+
+  # Take a snapshot of the specified host
+  #
+  # Specify a node name.
+  #
+  # When invoked as a block a result hash is yielded to the block as a
+  # parameter. Alternatively the result hash it is returned to the caller.
+  #
+  # If you have only provided 1 node in your nodeset, or you have specified a
+  # a default you can avoid entering the name of the node if you wish.
+  #
+  # @param node [String] node to snapshot
+  # @yield [result] yields result when called as a block
+  # @yieldparam result [RSpecSystem::Helpers::Snapshot] result of snapshot
+  # @return [RSpecSystem::Helpers::Snapshot] result of snapshot
+  # @example Using it as a helper
+  #   it { snapshot 'foo.box.name' }
+  def snapshot(nodename = node(), &block)
+    RSpecSystem::Helpers::Snapshot.new({ :n => nodename }, self, &block)
+  end
+
+  # Revert to a snapshot of the specified host
+  #
+  # Specify a node name.
+  #
+  # When invoked as a block a result hash is yielded to the block as a
+  # parameter. Alternatively the result hash it is returned to the caller.
+  #
+  # If you have only provided 1 node in your nodeset, or you have specified a
+  # a default you can avoid entering the name of the node if you wish.
+  #
+  # @param node [String] node to revert
+  # @yield [result] yields result when called as a block
+  # @yieldparam result [RSpecSystem::Helpers::Revert] result of revert
+  # @return [RSpecSystem::Helpers::Revert] result of rewert
+  # @example Using it as a helper
+  #   it { revert 'foo.box.name' }
+  def revert(nodename = node(), &block)
+    RSpecSystem::Helpers::Revert.new({ :n => nodename }, self, &block)
   end
 
   # @!group Queries

@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.email       = ["info@puppetlabs.com"]
   s.homepage    = "https://github.com/puppetlabs/rspec-system"
   s.summary     = "System testing with rspec"
-  s.license     = ["Apache 2.0"]
+  s.licenses    = ["Apache 2.0"]
 
   # Manifest
   s.files         = `git ls-files`.split("\n")
@@ -23,6 +23,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "net-ssh", '~>2.6'
   s.add_runtime_dependency "net-scp", '~>1.1'
   s.add_runtime_dependency "rbvmomi", '~>1.6'
+  s.add_runtime_dependency "sahara", '~>0.0'
   # It seems 1.6.0 relies on ruby 1.9.2, so lets pin it for now
   s.add_runtime_dependency "nokogiri", '~>1.5.9'
 end

@@ -33,11 +33,21 @@ module RSpecSystem
 
       log.info "[Vagrant#setup] Running 'vagrant up'"
       vagrant("up")
+      vagrant("sandbox on")
 
-      # Establish ssh connectivity
+      setup_ssh()
+
+      nil
+    end
+
+    # Establish ssh connectivity
+    #
+    # @api private
+    # @return [void]
+    def setup_ssh
       ssh_channels = {}
       nodes.each do |k,v|
-        log.info "[Vagrant#setup] establishing Net::SSH channel with #{k}"
+        log.info "[Vagrant#setup_ssl] establishing Net::SSH channel with #{k}"
         chan = Net::SSH.start(k, 'vagrant', :config => ssh_config)
         ssh_channels[k] = chan
       end
@@ -50,10 +60,7 @@ module RSpecSystem
     #
     # @return [void]
     def teardown
-      log.info "[Vagrant#teardown] closing all ssh channels"
-      RSpec.configuration.ssh_channels.each do |k,v|
-        v.close unless v.closed?
-      end
+      teardown_ssh()
 
       if destroy
         log.info "[Vagrant#teardown] Running 'vagrant destroy'"
@@ -62,6 +69,43 @@ module RSpecSystem
         log.info "[Vagrant#teardown] Skipping 'vagrant destroy'"
       end
       nil
+    end
+
+    # Teardown the ssh channels
+    #
+    # @api private
+    # @return [void]
+    def teardown_ssh
+      log.info "[Vagrant#teardown_ssh] closing all ssh channels"
+      RSpec.configuration.ssh_channels.each do |k,v|
+        v.close unless v.closed?
+      end
+    end
+
+
+    # Take a snapshot of the NodeSet
+    #
+    # @return [Boolean]
+    # @abstract Override this method and provide your own node teardown code
+    def snapshot(opts)
+      dest = opts[:n].name
+
+      log.info "[Vagrant#snapshot] taking snapshot"
+      vagrant("sandbox commit #{dest}")
+    end
+
+    # Revert the NodeSet to a snapshot
+    #
+    # @return [Boolean]
+    # @abstract Override this method and provide your own node teardown code
+    def revert(opts)
+      dest = opts[:n].name
+
+      log.info "[Vagrant#revert] reverting snapshot"
+      ret = vagrant("sandbox rollback #{dest}")
+      teardown_ssh()
+      setup_ssh()
+      ret
     end
 
     # Run a command on a host in the NodeSet.
@@ -182,7 +226,6 @@ module RSpecSystem
       Dir.chdir(@vagrant_path) do
         system("vagrant #{args}")
       end
-      nil
     end
 
   end
