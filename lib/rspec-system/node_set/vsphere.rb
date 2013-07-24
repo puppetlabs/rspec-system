@@ -164,7 +164,7 @@ module RSpecSystem
       ssh = RSpec.configuration.rspec_storage[:nodes][dest][:ssh]
       puts "-----------------"
       puts "#{dest}$ #{cmd}"
-      result = ssh_exec!(ssh, "cd /tmp && sudo sh -c '#{cmd}'")
+      result = ssh_exec!(ssh, "cd /tmp && sudo su - -c #{shellescape(cmd)}")
       puts "-----------------"
       result
     end

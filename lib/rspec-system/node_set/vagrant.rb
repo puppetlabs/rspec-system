@@ -75,7 +75,7 @@ module RSpecSystem
       ssh_channels = RSpec.configuration.ssh_channels
       puts "-----------------"
       puts "#{dest}$ #{cmd}"
-      result = ssh_exec!(ssh_channels[dest], "cd /tmp && sudo sh -c #{shellescape(cmd)}")
+      result = ssh_exec!(ssh_channels[dest], "cd /tmp && sudo su - -c #{shellescape(cmd)}")
       puts "-----------------"
       result
     end
