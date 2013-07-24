@@ -1,7 +1,18 @@
+2.1.2
+=====
+
+A meta-data only release, which adds the license to the gem specification.
+
+-------------------------------
+
 2.1.1
 =====
 
-This bug fix only adds lsb_* facts to the prefabs for: centos-64 and fedora-18
+This bug fix adds lsb_* facts to the prefabs for: centos-64 and fedora-18
+
+#### Detailed Changes
+
+* Add some missing facts (Mickaël Canévet)
 
 -------------------------------
 

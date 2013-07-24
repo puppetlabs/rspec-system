@@ -2,11 +2,12 @@
 Gem::Specification.new do |s|
   # Metadata
   s.name        = "rspec-system"
-  s.version     = "2.1.1"
+  s.version     = "2.1.2"
   s.authors     = ["Ken Barber"]
   s.email       = ["info@puppetlabs.com"]
   s.homepage    = "https://github.com/puppetlabs/rspec-system"
   s.summary     = "System testing with rspec"
+  s.license     = ["Apache 2.0"]
 
   # Manifest
   s.files         = `git ls-files`.split("\n")
