@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.email       = ["info@puppetlabs.com"]
   s.homepage    = "https://github.com/puppetlabs/rspec-system"
   s.summary     = "System testing with rspec"
-  s.license     = ["Apache 2.0"]
+  s.license     = "Apache 2.0"
 
   # Manifest
   s.files         = `git ls-files`.split("\n")
