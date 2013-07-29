@@ -43,6 +43,24 @@ module RSpecSystem
       raise "Unimplemented method #teardown"
     end
 
+    # Take a snapshot of a host in the NodeSet
+    #
+    # @param opts [Hash] options hash containing :n (node)
+    # @return [Boolean]
+    # @abstract Override this method and provide your own node teardown code
+    def snapshot(opts)
+      raise "Unimplemented method #snapshot"
+    end
+
+    # Revert a host in the NodeSet back one snapshot
+    #
+    # @param opts [Hash] options hash containing :n (node)
+    # @return [Boolean]
+    # @abstract Override this method and provide your own node teardown code
+    def revert(opts)
+      raise "Unimplemented method #revert"
+    end
+
     # Run a command on a host in the NodeSet.
     #
     # @param opts [Hash] options hash containing :n (node) and :c (command)
