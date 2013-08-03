@@ -72,15 +72,21 @@ module RSpecSystem
         lazy = false
       end
 
-      opts = {
+      # Merge defaults and such
+      @opts = {
         :node => opts[:n] || dn,
         :n => opts[:node] || dn,
         :timeout => opts[:timeout] || 0,
         :lazy => lazy,
       }.merge(opts)
 
-      @opts = opts
-      r = result_data unless opts[:lazy]
+      # Try to figure out :node using the node helper if a string is passed
+      if @opts[:node].is_a? String
+        @opts[:n] = @opts[:node] = get_node_by_name(@opts[:node])
+      end
+
+      # Try to lookup result_data now, unless we are lazy
+      result_data unless @opts[:lazy]
 
       # If called as a block, yield the result as a block
       if block_given?
@@ -164,6 +170,16 @@ module RSpecSystem
     # Return default node
     def default_node
       rspec_system_node_set.default_node
+    end
+
+    # Returns a node by its name.
+    #
+    # To be used by helpers that wish to retrieve a node by its name.
+    #
+    # @param name [String] name of the node
+    # @return [RSpecSystem::Node] node found
+    def get_node_by_name(name)
+      rspec_system_node_set.nodes[name]
     end
   end
 end

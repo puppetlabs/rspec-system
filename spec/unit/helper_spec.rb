@@ -23,6 +23,13 @@ describe 'RSpecSystem::Helper' do
       end
       block_exec.should be_true
     end
+
+    it 'should convert :node using get_node_by_name when passed as a string' do
+      RSpecSystem::Helper.any_instance.expects(:result_data)
+      RSpecSystem::Helper.any_instance.expects(:get_node_by_name).with('mynode').returns(node)
+      helper = RSpecSystem::Helper.new({:node => 'mynode'}, self)
+      helper.opts[:node].should == node
+    end
   end
 
   context '#refresh' do

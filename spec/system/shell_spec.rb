@@ -113,6 +113,18 @@ describe "shell:" do
     end
   end
 
+  it 'should support passing a node as an object' do
+    shell(:c => 'hostname', :n => node(:name => 'main')) do |r|
+      r.stdout.should =~ /main/
+    end
+  end
+
+  it 'should support passing a node as a string' do
+    shell(:c => 'hostname', :node => 'main') do |r|
+      r.stdout.should =~ /main/
+    end
+  end
+
   context 'legacy tests' do
     it 'cat /etc/hosts - test results using hash method' do
       shell 'cat /etc/hosts' do |r|
