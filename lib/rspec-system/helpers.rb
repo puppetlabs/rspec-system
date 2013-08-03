@@ -13,7 +13,7 @@ require 'rspec-system/helpers/rcp'
 #
 # The helpers themselves are split into two main groups, Queries:
 #
-# * +system_node+ - queries and returns node information
+# * +node+ - queries and returns node information
 #
 # And Actions:
 #
