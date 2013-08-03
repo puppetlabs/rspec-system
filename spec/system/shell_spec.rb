@@ -114,14 +114,14 @@ describe "shell:" do
   end
 
   it 'should support passing a node as an object' do
-    shell(:c => 'hostname', :n => node(:name => 'main')) do |r|
-      r.stdout.should =~ /main/
+    shell(:c => 'cat /etc/hosts', :n => node(:name => 'main')) do |r|
+      r.stdout.should =~ /localhost/
     end
   end
 
   it 'should support passing a node as a string' do
-    shell(:c => 'hostname', :node => 'main') do |r|
-      r.stdout.should =~ /main/
+    shell(:c => 'cat /etc/hosts', :node => 'main') do |r|
+      r.stdout.should =~ /localhost/
     end
   end
 
