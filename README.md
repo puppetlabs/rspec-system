@@ -114,6 +114,32 @@ The file must adhere to the Kwalify schema supplied in `resources/kwalify-schema
 * `sets -> [setname] -> nodes -> [name] -> prefab`: This relates to the prefabricated node template you wish to use. Currently this is the only way to launch a node. Look in `resources/prefabs.yml` for more details.
 * `default_set`: this is the default set to run if none are provided with `bundle exec rake spec:system`. This should be the most common platform normally.
 
+### Multi-node tests
+
+With `rspec-system` you can launch and perform tests and setup actions on multiple nodes.
+
+In your `.nodeset.yml` file you will need to define multiple nodes:
+
+    ---
+    sets:
+      'centos-59-x64-multinode':
+        nodes:
+          default_node: 'first.mydomain.vm':
+          'first.mydomain.vm':
+            prefab: 'centos-59-x64'
+          'second.mydomain.vm':
+            prefab: 'centos-59-x64'
+
+When you now run `rake spec:system` both nodes will launch.
+
+Tests need to be written specifically with multi-node in mind however. Normally, helpers will try to use the first (and thus default) node only when executed. If you wish to use a helper against a particular node instead, you can use the `:node` metaparameter to specify execution on a particular node.
+
+An example using the `shell` helper:
+
+    shell(:node => 'second.mydomain.vm', :command => 'hostname')
+
+This would execute the command `hostname` on node `second.mydomain.vm`.
+
 ### Prefabs
 
 Prefabs are 'pre-rolled' virtual images, for now its the only way to specify a template.
