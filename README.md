@@ -6,6 +6,26 @@ The goal here is to provide facilities to aid in the launching of tests nodes, c
 
 *Note:* This library is fairly new at the moment, so your mileage may vary. That said, if you're good at ruby and have an opinion, I'd appreciate patches and improvements to move this further torwards stability.
 
+### FAQ
+
+#### What is this tool, and why do I need it?
+
+`rspec-system` is a system testing tool that specializes in preparing test systems, running setup commands for a test and providing rspec helpers to assist with writing rspec assertions.
+
+In short, it tests software on real systems. For realz. It doesn't mock the execution of anything. So you would use this software, if you want more complete guarantees around the ability to run your software on a real operating system.
+
+For writing tests it uses the [rspec](https://www.relishapp.com/rspec) testing framework, used by many Ruby projects, your software however does not actually need to be written in Ruby - you just need to know a minimal amount of Ruby to write the tests.
+
+#### Can this tool be used to test Puppet?
+
+Yes it can. Check out the plugin: [rspec-system-serverspec](http://rubygems.org/gems/rspec-system-serverspec).
+
+#### How does this tool overlap with serverspec?
+
+`rspec-system` and `serverspec` are similar tools built to solve different testing perspectives. `serverspec` is aimed at validating a running environment with great tests and matchers that are made simple for administrators to write. `rspec-system` is an integration/system testing suite more then for built system validation. It is also used for testing a running environment, but its focus is more around testing system tools (such as Puppet for example) by launching nodes, setting up the software in question and performing tests on it. Thus `rspec-system` is appropriate for testing a piece of software, whereas `serverspec` is for validating a test or production system that has been built by some outside force.
+
+Of course the overlap is in what these tools do ultimately. `serverspec` logs into systems and runs commands to achieve its tests, and `rspec-system` is no different. However we have recognized `serverspec`'s strengths at the 'testing' end of the phase, so we have built a bridge so you can use `rspec-system` in your dev projects but benefit from the power of the `serverspec` tests and matchers: [rspec-system-serverspec](http://rubygems.org/gems/rspec-system-serverspec).
+
 ### Gem installation
 
 The intention is that this gem is used within your project as a development library.
@@ -215,7 +235,8 @@ Right now we have two types of plugins, the framework is in a state of flux as t
 
 Libraries that provide test helpers, and setup helpers for testing development on the software in question.
 
-* [rspec-system-puppet](http://rubygems.org/gems/rspec-system-puppet)
+* [rspec-system-puppet](http://rubygems.org/gems/rspec-system-puppet) - Helpers for testing out Puppet plugins
+* [rspec-system-serverspec](http://rubygems.org/gems/rspec-system-serverspec) - Imports the serverspec helpers and matchers so they can be used in rspec-system.
 
 #### Node providers
 
