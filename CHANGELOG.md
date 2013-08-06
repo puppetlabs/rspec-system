@@ -1,3 +1,15 @@
+2.2.0
+=====
+
+This feature release adds the ability to pass a node as a string to helpers, and improves documentation on multi-node support.
+
+#### Detailed Changes
+
+* Rename system_node to node in yarddoc (Ken Barber)
+* Add support for passing a node name as a string to the :node meta-parameter (Ken Barber)
+* Document basic multi-node usage (Ken Barber)
+* Created an FAQ section and included info about serverspec (Ken Barber)
+
 2.1.2
 =====
 
