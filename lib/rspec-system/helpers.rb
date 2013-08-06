@@ -75,10 +75,10 @@ module RSpecSystem::Helpers
   #   @param options [Hash] options for command execution
   #   @option options [String] :command command to execute. Mandatory.
   #   @option options [String] :c alias for :command
-  #   @option options [RSpecSystem::Node] :node (defaults to what was defined
+  #   @option options [String,RSpecSystem::Node] :node (defaults to what was defined
   #     default in your YAML file, otherwise if there is only one node it uses
   #     that) specifies node to execute command on.
-  #   @option options [RSpecSystem::Node] :n alias for :node
+  #   @option options [String,RSpecSystem::Node] :n alias for :node
   #   @option options [Fixnum] :timeout seconds of time to allow before timing
   #     out. Defaults to 0 (not timeout).
   # @overload shell(command)
