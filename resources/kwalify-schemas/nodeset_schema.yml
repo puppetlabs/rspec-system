@@ -15,4 +15,9 @@ mapping:
                 type: map
                 mapping:
                   prefab: { type: str }
+                  options:
+                    type: map
+                    mapping:
+                      memory: { type: int }
+                      cpus: { type: int }
                   role: { type: str }
