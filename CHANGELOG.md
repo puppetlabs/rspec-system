@@ -1,3 +1,10 @@
+2.2.1
+=====
+
+This minor fix release converts the Vagrant/Virtualbox provider to use version 2 of the configuration format, fixing some bugs in relation to warnings being printed to STDOUT instead of STDERR.
+
+-------------------------------
+
 2.2.0
 =====
 
@@ -9,6 +16,8 @@ This feature release adds the ability to pass a node as a string to helpers, and
 * Add support for passing a node name as a string to the :node meta-parameter (Ken Barber)
 * Document basic multi-node usage (Ken Barber)
 * Created an FAQ section and included info about serverspec (Ken Barber)
+
+-------------------------------
 
 2.1.2
 =====
