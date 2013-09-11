@@ -129,17 +129,19 @@ module RSpecSystem
       log.info "[Vagrant#create_vagrantfile] Creating vagrant file here: #{@vagrant_path}"
       FileUtils.mkdir_p(@vagrant_path)
       File.open(File.expand_path(File.join(@vagrant_path, "Vagrantfile")), 'w') do |f|
-        f.write("Vagrant::Config.run do |c|\n")
+        f.write('Vagrant.configure("2") do |c|' + "\n")
         nodes.each do |k,v|
           log.debug "Filling in content for #{k}"
 
           ps = v.provider_specifics['vagrant']
 
           node_config = "  c.vm.define '#{k}' do |v|\n"
-          node_config << "    v.vm.host_name = '#{k}'\n"
+          node_config << "    v.vm.hostname = '#{k}'\n"
           node_config << "    v.vm.box = '#{ps['box']}'\n"
           node_config << "    v.vm.box_url = '#{ps['box_url']}'\n" unless ps['box_url'].nil?
-          node_config << "    v.vm.base_mac = '#{randmac}'\n"
+          node_config << "    v.vm.provider 'virtualbox' do |vbox|\n"
+          node_config << "      vbox.customize ['modifyvm',:id,'--macaddress1','#{randmac}']\n"
+          node_config << "    end\n"
           node_config << "  end\n"
 
           f.write(node_config)
