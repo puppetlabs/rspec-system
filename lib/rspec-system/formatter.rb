@@ -24,7 +24,7 @@ module RSpecSystem
     def start(count)
       @max_tests = count
       super(count)
-      output << "=================================================================\n\n"
+      output << "\n"
       output << bold("Commencing rspec-system tests\n")
       output << bold("Total Test Count: ") << color(count, :cyan) << "\n\n"
     end
@@ -35,7 +35,7 @@ module RSpecSystem
     # @return [void]
     def example_started(example)
       super(example)
-      output << "=================================================================\n\n"
+      output << "\n=begin===========================================================\n\n"
       output << bold("Running test: ") << "#{next_index} of #{@max_tests}" << "\n"
       output << bold("Description:\n  ") << color(example.full_description, :magenta) << "\n\n"
     end
@@ -47,6 +47,7 @@ module RSpecSystem
     def example_passed(example)
       super(example)
       output << "\n" << bold('Result: ') << success_color('passed') << "\n\n"
+      output << "=end=============================================================\n\n"
     end
 
     # Display output when an example is pending
@@ -58,6 +59,7 @@ module RSpecSystem
       msg = example.execution_result[:pending_message]
       output << "\n" << bold('Result: ') << pending_color('pending') << "\n"
       output << bold("Reason: ") << "#{msg}\n\n"
+      output << "=end=============================================================\n\n"
     end
 
     # Display output when an example has failed
@@ -69,6 +71,7 @@ module RSpecSystem
       msg = example.execution_result[:exception]
       output << "\n" << bold('Result: ') << failure_color('failed') << "\n"
       output << bold("Reason:\n") << "#{msg}\n\n"
+      output << "=end=============================================================\n\n"
     end
 
     # Obtains next index value so we can keep a count of what test we are upto
