@@ -1,3 +1,31 @@
+2.3.0
+=====
+
+Rework the look and feel to make it pretty and add color
+
+This feature release is primarily a look and feel update that improves the visual look of
+how tests run. It changes the way `shell` and `rcp` output looks and includes
+more color where applicable.
+
+The output now uses the formatters output methods, in a mildly hackish way so
+that colors can be disabled centrally and also so if users switch to a different
+format the output is silenced. This is useful for cases where you want to run
+the progress formatter without all the extra noise for example.
+
+The dividers are now a little better, showing you the begin and end of blocks
+in a better way now, so it is slightly easier to see before/after runs
+without them bleeding into the test parts.
+
+As an aside I've also migrated the scp methodology from vsphere to vagrant so
+we are using the same channel to transfer files as well as for sending commands
+which should in theory be a perf boost, but as yet I've seen little evidence.
+
+#### Detailed Changes
+
+* Rework the look and feel to make it pretty and add color (Ken Barber)
+
+-------------------------------
+
 2.2.1
 =====
 
