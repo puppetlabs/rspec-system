@@ -127,25 +127,25 @@ module RSpecSystem
           end
           channel.on_data do |ch,data|
             d = data
-            print d
+            output << d
             r[:stdout]+=d
           end
 
           channel.on_extended_data do |ch,type,data|
             d = data
-            print d
+            output << d
             r[:stderr]+=d
           end
 
           channel.on_request("exit-status") do |ch,data|
             c = data.read_long
-            puts "Exit code: #{c}"
+            output << bold("Exit code:") << " #{c}\n"
             r[:exit_code] = c
           end
 
           channel.on_request("exit-signal") do |ch, data|
             s = data.read_string
-            puts "Exit signal: #{s}"
+            output << bold("Exit signal:") << " #{s}\n"
             r[:exit_signal] = s
           end
         end

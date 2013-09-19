@@ -31,6 +31,10 @@ module RSpecSystem::Helpers
 
     # Gathers new results by executing the resource action
     def execute
+      dest = opts[:n].name
+      cmd = opts[:c]
+
+      output << bold(color("#{dest}$", :green)) << " #{cmd}\n"
       rspec_system_node_set.run(opts)
     end
   end
