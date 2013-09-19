@@ -19,29 +19,30 @@ module RSpecSystem
     def initialize(setname, config, custom_prefabs_path, options)
       super
       @vagrant_path = File.expand_path(File.join(RSpec.configuration.system_tmp, 'vagrant_projects', setname))
+
+      RSpec.configuration.rspec_storage[:nodes] ||= {}
     end
 
     # Setup the NodeSet by starting all nodes.
     #
     # @return [void]
     def setup
-      log.info "[Vagrant#setup] Begin setting up vagrant"
-
       create_vagrantfile()
 
       teardown()
 
-      log.info "[Vagrant#setup] Running 'vagrant up'"
+      output << bold(color("localhost$", :green)) << " vagrant up\n"
       vagrant("up")
 
       # Establish ssh connectivity
-      ssh_channels = {}
       nodes.each do |k,v|
-        log.info "[Vagrant#setup] establishing Net::SSH channel with #{k}"
+        output << bold(color("localhost$", :green)) << " ssh #{k}\n"
         chan = Net::SSH.start(k, 'vagrant', :config => ssh_config)
-        ssh_channels[k] = chan
+
+        RSpec.configuration.rspec_storage[:nodes][k] = {
+          :ssh => chan,
+        }
       end
-      RSpec.configuration.ssh_channels = ssh_channels
 
       nil
     end
@@ -50,16 +51,18 @@ module RSpecSystem
     #
     # @return [void]
     def teardown
-      log.info "[Vagrant#teardown] closing all ssh channels"
-      RSpec.configuration.ssh_channels.each do |k,v|
-        v.close unless v.closed?
+      nodes.each do |k,v|
+        storage = RSpec.configuration.rspec_storage[:nodes][k]
+
+        next if storage.nil?
+
+        ssh = storage[:ssh]
+        ssh.close unless ssh.closed?
       end
 
       if destroy
-        log.info "[Vagrant#teardown] Running 'vagrant destroy'"
+        output << bold(color("localhost$", :green)) << " vagrant destroy --force\n"
         vagrant("destroy --force")
-      else
-        log.info "[Vagrant#teardown] Skipping 'vagrant destroy'"
       end
       nil
     end
@@ -72,12 +75,8 @@ module RSpecSystem
       dest = opts[:n].name
       cmd = opts[:c]
 
-      ssh_channels = RSpec.configuration.ssh_channels
-      puts "-----------------"
-      puts "#{dest}$ #{cmd}"
-      result = ssh_exec!(ssh_channels[dest], "cd /tmp && sudo sh -c #{shellescape(cmd)}")
-      puts "-----------------"
-      result
+      ssh = RSpec.configuration.rspec_storage[:nodes][dest][:ssh]
+      ssh_exec!(ssh, "cd /tmp && sudo sh -c #{shellescape(cmd)}")
     end
 
     # Transfer files to a host in the NodeSet.
@@ -88,8 +87,6 @@ module RSpecSystem
     #   path then move it later. Its slow and brittle and we need a better
     #   solution. Its also very Linux-centrix in its use of temp dirs.
     def rcp(opts)
-      #log.debug("[Vagrant@rcp] called with #{opts.inspect}")
-
       dest = opts[:d].name
       source = opts[:sp]
       dest_path = opts[:dp]
@@ -98,23 +95,13 @@ module RSpecSystem
       tmpdest = tmppath
 
       # Do the copy and print out results for debugging
-      cmd = "scp -r -F '#{ssh_config}' '#{source}' #{dest}:#{tmpdest}"
-      puts "------------------"
-      puts "localhost$ #{cmd}"
-      r = systemu cmd
-
-      result = {
-        :exit_code => r[0].exitstatus,
-        :stdout => r[1],
-        :stderr => r[2]
-      }
-
-      print "#{result[:stdout]}"
-      print "#{result[:stderr]}"
-      puts "Exit code: #{result[:exit_code]}"
+      cmd = "scp -r '#{source}' #{dest}:#{tmpdest}"
+      output << bold(color("localhost$", :green)) << " #{cmd}\n"
+      ssh = RSpec.configuration.rspec_storage[:nodes][dest][:ssh]
+      ssh.scp.upload! source.to_s, tmpdest.to_s, :recursive => true
 
       # Now we move the file into their final destination
-      result = run(:n => opts[:d], :c => "mv #{tmpdest} #{dest_path}")
+      result = shell(:n => opts[:d], :c => "mv #{tmpdest} #{dest_path}")
       if result[:exit_code] == 0
         return true
       else
@@ -126,13 +113,11 @@ module RSpecSystem
     #
     # @api private
     def create_vagrantfile
-      log.info "[Vagrant#create_vagrantfile] Creating vagrant file here: #{@vagrant_path}"
+      output << bold(color("localhost$", :green)) << " cd #{@vagrant_path}\n"
       FileUtils.mkdir_p(@vagrant_path)
       File.open(File.expand_path(File.join(@vagrant_path, "Vagrantfile")), 'w') do |f|
         f.write('Vagrant.configure("2") do |c|' + "\n")
         nodes.each do |k,v|
-          log.debug "Filling in content for #{k}"
-
           ps = v.provider_specifics['vagrant']
 
           node_config = "  c.vm.define '#{k}' do |v|\n"
@@ -148,7 +133,6 @@ module RSpecSystem
         end
         f.write("end\n")
       end
-      log.debug "[Vagrant#create_vagrantfile] Finished creating vagrant file"
       nil
     end
 
@@ -167,7 +151,6 @@ module RSpecSystem
       self.nodes.each do |k,v|
         Dir.chdir(@vagrant_path) do
           result = systemu("vagrant ssh-config #{k} >> #{ssh_config_path}")
-          puts result.inspect
         end
       end
       ssh_config_path

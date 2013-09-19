@@ -29,20 +29,19 @@ RSpec.configure do |c|
     begin
       start_nodes
     rescue => ex
-      puts ex.inspect + " in"
-      puts ex.backtrace.join("\n  ")
+      output << ex.inspect + " in\n"
+      output << ex.backtrace.join("\n  ") << "\n"
       exit(1)
     end
   end
 
   c.after :suite do
-    puts "================================================================="
     # After Suite exceptions get captured it seems
     begin
       stop_nodes
     rescue => ex
-      puts ex.inspect + " in"
-      puts ex.backtrace.join("\n  ")
+      output << ex.inspect + " in\n"
+      output << ex.backtrace.join("\n  ") << "\n"
     end
   end
 end

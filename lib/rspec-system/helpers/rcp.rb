@@ -37,7 +37,6 @@ module RSpecSystem::Helpers
       sp = opts[:sp]
       dp = opts[:dp]
 
-      log.info("rcp from #{sp} to #{d.name}:#{dp} executed")
       result = ns.rcp(opts)
       { :success => result }
     end

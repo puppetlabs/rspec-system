@@ -37,8 +37,6 @@ module RSpecSystem
     #
     # @return [void]
     def setup
-      log.info "[Vsphere#setup] Setup begins"
-
       dest_dir = ENV['RSPEC_VSPHERE_DEST_DIR']
       template_dir = ENV['RSPEC_VSPHERE_TEMPLATE_DIR']
 
@@ -56,7 +54,7 @@ module RSpecSystem
       vm_folder = dc.vmFolder
       vm_newfolder = vm_folder.find(dest_dir)
 
-      log.info "[Vsphere#setup] launching instances one by one"
+      log.info "Launching VSphere instances one by one"
       nodes.each do |k,v|
         ps = v.provider_specifics['vsphere']
 
@@ -66,7 +64,7 @@ module RSpecSystem
 
         raise "No template specified for this prefab" if template.nil?
 
-        log.info "[Vsphere#setup] launching instance #{k} with template #{template}"
+        log.info "Launching VSphere instance #{k} with template #{template}"
 
         vm = vm_folder.find(ENV['RSPEC_VSPHERE_TEMPLATE_DIR']).find(template)
 
@@ -74,7 +72,7 @@ module RSpecSystem
 
         vm_name = "rspec-system-#{k}-#{random_string(10)}"
 
-        log.info "[Vsphere#setup] Cloning new vm #{vm_name} in folder #{dest_dir}"
+        log.info "Cloning new VSphere vm #{vm_name} in folder #{dest_dir}"
 
         vm.CloneVM_Task(
           :folder => vm_newfolder,
@@ -82,7 +80,7 @@ module RSpecSystem
           :spec => spec
         ).wait_for_completion
 
-        log.info "[Vsphere#setup] Cloning complete"
+        log.info "Cloning complete"
 
         newvm = vm_newfolder.find(vm_name)
         guest_info = newvm.guest
@@ -90,20 +88,20 @@ module RSpecSystem
         timeout(60) do
           while(newvm.guest.guestState != 'running') do
             sleep 2
-            puts "#{k}> Waiting for vm to run ..."
+            log.info "#{k}> Waiting for vm to run ..."
           end
         end
 
         timeout(60) do
           while(newvm.guest.ipAddress == nil) do
             sleep 2
-            puts "#{k}> Waiting for ip address ..."
+            log.info "#{k}> Waiting for ip address ..."
           end
         end
 
         ipaddress = newvm.guest.ipAddress
 
-        log.info "[Vsphere#setup] establishing Net::SSH channel with #{k}"
+        output << bold(color("localhost$", :green)) << " ssh #{k}"
         chan = Net::SSH.start(ipaddress, 'vagrant', :password => 'vagrant')
 
         RSpec.configuration.rspec_storage[:nodes][k] = {
@@ -111,10 +109,7 @@ module RSpecSystem
           :ssh => chan,
           :vm => newvm
         }
-        log.info "[Vsphere#setup] Node launched: #{k}"
       end
-
-      log.info("[Vsphere#setup] setup complete")
 
       nil
     end
@@ -127,25 +122,23 @@ module RSpecSystem
         storage = RSpec.configuration.rspec_storage[:nodes][k]
 
         if storage.nil?
-          log.info "[Vsphere#teardown] No entry for node #{k}, no teardown necessary"
+          log.info "No entry for node #{k}, no teardown necessary"
           next
         end
 
-        log.info "[Vsphere#teardown] closing ssh channel to #{k}"
         ssh = storage[:ssh]
         ssh.close unless ssh.closed?
 
         if destroy
-          log.info "[Vsphere#teardown] destroy instance #{k}"
+          log.info "Destroying instance #{k}"
           vm = storage[:vm]
           if vm == nil
-            puts "No vm object"
+            log.error "No vm object for #{k}"
             next
           end
           vm.PowerOffVM_Task.wait_for_completion
           vm.Destroy_Task.wait_for_completion
         else
-          log.info "[Vsphere#teardown] Skipping destroy instance #{k}"
           next
         end
       end
@@ -162,11 +155,7 @@ module RSpecSystem
       cmd = opts[:c]
 
       ssh = RSpec.configuration.rspec_storage[:nodes][dest][:ssh]
-      puts "-----------------"
-      puts "#{dest}$ #{cmd}"
-      result = ssh_exec!(ssh, "cd /tmp && sudo sh -c '#{cmd}'")
-      puts "-----------------"
-      result
+      ssh_exec!(ssh, "cd /tmp && sudo sh -c '#{cmd}'")
     end
 
     # Transfer files to a host in the NodeSet.
@@ -177,8 +166,6 @@ module RSpecSystem
     #   path then move it later. Its slow and brittle and we need a better
     #   solution. Its also very Linux-centrix in its use of temp dirs.
     def rcp(opts)
-      #log.debug("[Vagrant@rcp] called with #{opts.inspect}")
-
       dest = opts[:d].name
       source = opts[:sp]
       dest_path = opts[:dp]

@@ -67,20 +67,20 @@ module RSpecSystem::InternalHelpers
   def start_nodes
     ns = rspec_system_node_set
 
-    puts "Starting nodes"
-    puts
-    puts "Setname is: " + ns.setname
-    puts "Configuration is: " + ns.config.pretty_inspect
-    puts "Virtual Environment type is: #{ns.env_type}"
-    puts "Default node is: #{ns.default_node.name}"
-    puts "Destroy node is: #{ns.destroy}"
-    puts
-
+    output << "=begin===========================================================\n"
+    output << "\n"
+    output << bold("Starting nodes") << "\n"
+    output << "\n"
+    output << bold("Setname:") << "             #{ns.setname}\n"
+    output << bold("Configuration:") << "       #{ns.config.pretty_inspect}"
+    output << bold("Virtual Environment:") << " #{ns.env_type}\n"
+    output << bold("Default node:") << "        #{ns.default_node.name}\n"
+    output << bold("Destroy node:") << "        #{ns.destroy}\n"
+    output << "\n"
     ns.setup
-
-    puts
-    puts "Finished starting nodes"
-    puts "================================================================="
+    output << "\n"
+    output << "=end=============================================================\n"
+    output << "\n"
     nil
   end
 
@@ -88,11 +88,14 @@ module RSpecSystem::InternalHelpers
   #
   # @return [void]
   def stop_nodes
-    puts 'Stopping nodes'
-    puts
+    output << "\n"
+    output << "=begin===========================================================\n"
+    output << "\n"
+    output << bold("Stopping nodes\n")
+    output << "\n"
     rspec_system_node_set.teardown
-    puts 'Finished stopping nodes'
-    puts "================================================================="
+    output << "\n"
+    output << "=end=============================================================\n"
     nil
   end
 end
