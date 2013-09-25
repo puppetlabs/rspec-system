@@ -1,0 +1,15 @@
+---
+default_set: 'centos-58-x64'
+sets:
+  'centos-58-x64':
+    nodes:
+      "master":
+        prefab: 'centos-58-x64'
+        options:
+          cpus: 2
+          memory: 4096 #mb
+      "agent":
+        prefab: 'centos-58-x64'
+        options:
+          cpus: 1
+          memory: 768 #mb

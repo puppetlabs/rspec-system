@@ -119,13 +119,15 @@ module RSpecSystem
         f.write('Vagrant.configure("2") do |c|' + "\n")
         nodes.each do |k,v|
           ps = v.provider_specifics['vagrant']
+          default_options = { 'mac' => randmac }
+          options = default_options.merge(v.options || {})
 
           node_config = "  c.vm.define '#{k}' do |v|\n"
           node_config << "    v.vm.hostname = '#{k}'\n"
           node_config << "    v.vm.box = '#{ps['box']}'\n"
           node_config << "    v.vm.box_url = '#{ps['box_url']}'\n" unless ps['box_url'].nil?
           node_config << "    v.vm.provider 'virtualbox' do |vbox|\n"
-          node_config << "      vbox.customize ['modifyvm',:id,'--macaddress1','#{randmac}']\n"
+          node_config << customize_virtualbox(k,options)
           node_config << "    end\n"
           node_config << "  end\n"
 
@@ -134,6 +136,27 @@ module RSpecSystem
         f.write("end\n")
       end
       nil
+    end
+
+    # Adds virtualbox customization to the Vagrantfile
+    # 
+    # @api private
+    # @param name [String] name of the node
+    # @param options [Hash] customization options
+    # @return [String] a series of vbox.customize lines
+    def customize_virtualbox(name,options)
+      custom_config = ""
+      options.each_pair do |key,value|
+        case key
+        when 'cpus','memory'
+          custom_config << "    vbox.customize ['modifyvm', :id, '--#{key}','#{value}']\n"
+        when 'mac'
+          custom_config << "    vbox.customize ['modifyvm', :id, '--macaddress1','#{value}']\n"
+        else
+          log.warn("Skipped invalid custom option for node #{name}: #{key}=#{value}")
+        end
+      end
+      custom_config
     end
 
     # Here we get vagrant to drop the ssh_config its using so we can monopolize
