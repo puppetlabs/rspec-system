@@ -18,7 +18,8 @@ module RSpecSystem
         :nodeset => nodeset,
         :custom_prefabs_path => custom_prefabs_path,
         :name => k,
-        :prefab => v['prefab']
+        :prefab => v['prefab'],
+        :options => v['options']
       )
     end
 
@@ -27,6 +28,7 @@ module RSpecSystem
     # @param options [Hash] options for new node
     # @option options [String] :name name of node. Mandatory.
     # @option options [String] :prefab prefab setting. Mandatory.
+    # @option options [String] :options options setting. Optional.
     # @option options [RSpecSystem::NodeSet] :nodeset the parent nodeset for
     #   this node. Mandatory.
     # @option options [String] :custom_prefabs_path path of custom prefabs
@@ -34,6 +36,7 @@ module RSpecSystem
     def initialize(options)
       @name = options[:name]
       prefab = options[:prefab]
+      @options = options[:options]
       @nodeset = options[:nodeset]
       @custom_prefabs_path = options[:custom_prefabs_path]
 
@@ -59,6 +62,13 @@ module RSpecSystem
     # @return [RSpecSystem::Prefab] the prefab object used to create this node
     def prefab
       @prefab
+    end
+
+    # Returns the custom object for this node (if any).
+    #
+    # @return [Hash] the options object used to customize the node
+    def options
+      @options
     end
 
     # Retreives facts from the nodeset definition or prefab.

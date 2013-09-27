@@ -140,6 +140,35 @@ An example using the `shell` helper:
 
 This would execute the command `hostname` on node `second.mydomain.vm`.
 
+### Custom node options
+
+By default, `rspec-system` launches nodes with the settings that were baked into the prefab. This means that your node's physical properties like RAM and vCPU count depend on the prefab selected. If you need to customize these values, `rspec-system` provides node-level customization in `.nodeset.yml` under `options`.
+
+Currently supported options are:
+
+* *cpus:* number of virtual cpus
+* *memory:* memory in MB
+
+Example:
+
+    ---
+    sets:
+      'centos-59-x64-multinode':
+        nodes:
+          default_node: 'first.mydomain.vm':
+          'first.mydomain.vm':
+            prefab: 'centos-59-x64'
+            options:
+              cpus: 2
+              memory: 1024 #mb
+          'second.mydomain.vm':
+            prefab: 'centos-59-x64'
+            options:
+              cpus: 1
+              memory: 512 #mb
+
+*Note:* These options are currently only supported on Vagrant + VirtualBox. On other providers they are ignored.
+
 ### Prefabs
 
 Prefabs are 'pre-rolled' virtual images, for now its the only way to specify a template.
