@@ -18,7 +18,7 @@ For writing tests it uses the [rspec](https://www.relishapp.com/rspec) testing f
 
 #### Can this tool be used to test Puppet?
 
-Yes it can. Check out the plugin: [rspec-system-serverspec](http://rubygems.org/gems/rspec-system-serverspec).
+Yes it can. Check out the plugin: [rspec-system-puppet](http://rubygems.org/gems/rspec-system-puppet).
 
 #### How does this tool overlap with serverspec?
 
