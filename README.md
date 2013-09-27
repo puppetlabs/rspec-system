@@ -73,7 +73,7 @@ An example file would look like this:
         its(:exit_code) { should be_zero }
       end
 
-      it 'should cat /etc/resolv.conf' do
+      it 'should cat /etc/hosts' do
         # Here we run the shell command as a helper
         shell 'cat /etc/hosts' do |r|
           r.stdout.should =~ /localhost/
