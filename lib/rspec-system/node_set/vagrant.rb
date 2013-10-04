@@ -9,6 +9,7 @@ module RSpecSystem
     include RSpecSystem::Util
 
     ENV_TYPE = 'vagrant'
+    VALID_VM_OPTIONS = ['ip']
 
     # Creates a new instance of RSpecSystem::NodeSet::Vagrant
     #
@@ -126,6 +127,7 @@ module RSpecSystem
           node_config << "    v.vm.hostname = '#{k}'\n"
           node_config << "    v.vm.box = '#{ps['box']}'\n"
           node_config << "    v.vm.box_url = '#{ps['box_url']}'\n" unless ps['box_url'].nil?
+          node_config << customize_vm(k,options)
           node_config << "    v.vm.provider 'virtualbox' do |vbox|\n"
           node_config << customize_virtualbox(k,options)
           node_config << "    end\n"
@@ -147,6 +149,7 @@ module RSpecSystem
     def customize_virtualbox(name,options)
       custom_config = ""
       options.each_pair do |key,value|
+        next if VALID_VM_OPTIONS.include?(key)
         case key
         when 'cpus','memory'
           custom_config << "    vbox.customize ['modifyvm', :id, '--#{key}','#{value}']\n"
@@ -157,6 +160,25 @@ module RSpecSystem
         end
       end
       custom_config
+    end
+
+    # Adds VM customization to the Vagrantfile
+    #
+    # @api private
+    # @param name [String] name of the node
+    # @param options [Hash] customization options
+    # @return [String] a series of v.vm lines
+    def customize_vm(name,options)
+      vm_config = ""
+      options.each_pair do |key,value|
+        case key
+        when 'ip'
+          vm_config << "    v.vm.network :private_network, :ip => '#{value}'\n"
+        else
+          next
+        end
+      end
+      vm_config
     end
 
     # Here we get vagrant to drop the ssh_config its using so we can monopolize
