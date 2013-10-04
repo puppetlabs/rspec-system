@@ -146,6 +146,7 @@ By default, `rspec-system` launches nodes with the settings that were baked into
 
 Currently supported options are:
 
+* *ip:* additional IP address
 * *cpus:* number of virtual cpus
 * *memory:* memory in MB
 
@@ -159,11 +160,13 @@ Example:
           'first.mydomain.vm':
             prefab: 'centos-59-x64'
             options:
+              ip: '192.168.1.2'
               cpus: 2
               memory: 1024 #mb
           'second.mydomain.vm':
             prefab: 'centos-59-x64'
             options:
+              ip: '192.168.1.3'
               cpus: 1
               memory: 512 #mb
 

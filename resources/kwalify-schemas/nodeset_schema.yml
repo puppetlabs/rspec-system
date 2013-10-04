@@ -18,6 +18,7 @@ mapping:
                   options:
                     type: map
                     mapping:
+                      ip: { type: str }
                       memory: { type: int }
                       cpus: { type: int }
                   role: { type: str }
