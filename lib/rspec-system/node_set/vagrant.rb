@@ -1,6 +1,8 @@
 require 'fileutils'
 require 'systemu'
 require 'net/ssh'
+require 'net/scp'
+require 'rspec-system/node_set/base'
 
 module RSpecSystem
   # A NodeSet implementation for Vagrant.

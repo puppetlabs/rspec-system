@@ -3,6 +3,7 @@ require 'systemu'
 require 'net/ssh'
 require 'net/scp'
 require 'rbvmomi'
+require 'rspec-system/node_set/base'
 
 module RSpecSystem
   # A NodeSet implementation for VSphere
