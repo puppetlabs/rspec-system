@@ -1,3 +1,22 @@
+2.4.0
+=====
+
+This feature release contains a number of new features:
+
+* We now have an 'options' parameter for a node definition which allows customisation of the ip address, number of CPUs and amount of memory for a node. Currently this is only accepted for the Vagrant/Virtualbox provider.
+* Dynamic loading of node_set plugins is now provided. This drops the requirement for having to 'require' the plugin to load it.
+
+#### Detailed Changes
+
+* (GH-44) Add 'options' parameter to node definition (Justen Walker)
+* (GH-44) Support custom options for Vagrantfiles (Justen Walker)
+* Fix wrong reference in README. (Stefano Zanella)
+* Fix typo in example test code. (Stefano Zanella)
+* Add 'ip' option to the 'options' parameter for node definitions (Trey Dockendorf)
+* Add a simple plugin loading system for node_set plugins (Erik Dalén)
+
+-------------------------------
+
 2.3.0
 =====
 
