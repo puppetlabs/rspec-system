@@ -1,3 +1,10 @@
+2.5.1
+=====
+
+This bug release fixes setting the hostname and /etc/hosts setup for VSphere.
+
+-------------------------------
+
 2.5.0
 =====
 
