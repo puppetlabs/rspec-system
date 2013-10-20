@@ -257,6 +257,16 @@ module RSpecSystem
           end
           time3 = Time.now
           log.info "#{k}> Took #{time3 - start_time} seconds for instance to be ready"
+
+          ######################
+          # Do initial box setup
+          ######################
+          hosts = <<-EOS
+127.0.0.1 localhost localhost.localdomain
+#{ipaddress}  #{k}
+          EOS
+          shell(:n => k, :c => "echo '#{hosts}' > /etc/hosts")
+          shell(:n => k, :c => "hostname #{k}")
         end
       end
 
