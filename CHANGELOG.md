@@ -1,3 +1,18 @@
+2.5.0
+=====
+
+This feature release improves the VSPhere provider.
+
+* Additional settings have been provided to manage the deployment of nodes in VSphere
+* Extra settings added to control timeouts and retries
+* The main resiliency code has been overhauled and now we have retry handling for most external calls
+
+#### Detailed Changes
+
+* Repair vsphere provider (Ken Barber)
+
+-------------------------------
+
 2.4.0
 =====
 
