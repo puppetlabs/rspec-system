@@ -278,6 +278,17 @@ This provider has a lot more options for setup, in the form of environment varia
 * *RSPEC_VSPHERE_DEST_DIR* - destination path to launch vm's
 * *RSPEC_VSPHERE_TEMPLATE_DIR* - path to where you deployed the templates from the OVF files described above
 * *RSPEC_VSPHERE_RPOOL* - name of resource pool to use
+* *RSPEC_VSPHERE_CLUSTER* - name of the cluster to use
+* *RSPEC_VSPHERE_SSH_KEYS* - path to private key for authentication. Multiple paths may be provided using a colon separator.
+* *RSPEC_VSPHERE_DATACENTER* - optional name of VSphere data centre
+* *RSPEC_VSPHERE_NODE_TIMEOUT* - amount of seconds before trying to relaunch a node. Defaults to 1200.
+* *RSPEC_VSPHERE_NODE_TRIES* - amount of attempts to relaunch a node. Defaults to 10.
+* *RSPEC_VSPHERE_NODE_SLEEP* - amount of seconds to sleep for before trying again. Defaults to a random number between 30 and 90.
+* *RSPEC_VSPHERE_SSH_TIMEOUT* - amount of seconds before retrying to SSH into a node. Default to 60.
+* *RSPEC_VSPHERE_SSH_TRIES* - amount of attempts to SSH into a node. Defaults to 10.
+* *RSPEC_VSPHERE_SSH_SLEEP* - amount of seconds to sleep before trying to SSH again. Defaults to 4.
+* *RSPEC_VSPHERE_CONNECT_TIMEOUT* - amount of seconds before retrying to connect to the VSphere API. Defaults to 60.
+* *RSPEC_VSPHERE_CONNECT_TRIES* - amount of attempts to connect to the VSphere API. Defaults to 10.
 
 Set these variables, and run the usual rake command:
 

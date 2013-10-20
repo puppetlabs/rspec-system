@@ -56,17 +56,17 @@ describe "shell:" do
   end
 
   it 'escape all quotes properly' do
-    shell 'rm -f ~vagrant/foo'
-    shell "su - vagrant -c 'echo \"foo bar baz\" > ~/foo'" do |r|
+    shell 'rm -f ~/foo'
+    shell "bash -c 'echo \"foo bar baz\" > ~/foo'" do |r|
       r.stderr.should be_empty
       r.exit_code.should be_zero
     end
 
-    shell 'cat ~vagrant/foo' do |r|
+    shell 'cat ~/foo' do |r|
       r.stdout.should =~ /foo bar baz/
       r.exit_code.should be_zero
     end
-    shell 'rm -f ~vagrant/foo'
+    shell 'rm -f ~/foo'
   end
 
   it 'a string of commands should succeed' do
@@ -140,7 +140,7 @@ describe "shell:" do
     end
 
     it 'should complete fine if command completed within timeout' do
-      shell(:c => 'sleep 1', :timeout => 5) do |r|
+      shell(:c => 'sleep 1', :timeout => 10) do |r|
         r.stdout.should == ''
         r.stderr.should == ''
         r.exit_code.should == 0

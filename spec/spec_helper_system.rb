@@ -21,6 +21,7 @@ RSpec.configure do |c|
   c.include ::LocalHelpers
 
   c.before :suite do
+    shell 'echo "mesg n" >> ~/.profile'
     shell 'echo foobar > /tmp/setupblock'
   end
 end
