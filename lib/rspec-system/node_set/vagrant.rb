@@ -105,11 +105,7 @@ module RSpecSystem
 
       # Now we move the file into their final destination
       result = shell(:n => opts[:d], :c => "mv #{tmpdest} #{dest_path}")
-      if result[:exit_code] == 0
-        return true
-      else
-        return false
-      end
+      result[:exit_code] == 0
     end
 
     # Create the Vagrantfile for the NodeSet.
@@ -143,7 +139,7 @@ module RSpecSystem
     end
 
     # Adds virtualbox customization to the Vagrantfile
-    # 
+    #
     # @api private
     # @param name [String] name of the node
     # @param options [Hash] customization options
@@ -197,7 +193,7 @@ module RSpecSystem
       end
       self.nodes.each do |k,v|
         Dir.chdir(@vagrant_path) do
-          result = systemu("vagrant ssh-config #{k} >> #{ssh_config_path}")
+          systemu("vagrant ssh-config #{k} >> #{ssh_config_path}")
         end
       end
       ssh_config_path
