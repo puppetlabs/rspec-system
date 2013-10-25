@@ -123,8 +123,8 @@ In your `.nodeset.yml` file you will need to define multiple nodes:
     ---
     sets:
       'centos-59-x64-multinode':
+        default_node: 'first.mydomain.vm'
         nodes:
-          default_node: 'first.mydomain.vm':
           'first.mydomain.vm':
             prefab: 'centos-59-x64'
           'second.mydomain.vm':
