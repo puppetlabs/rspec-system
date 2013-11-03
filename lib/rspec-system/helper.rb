@@ -1,6 +1,5 @@
 require 'rspec-system'
 require 'rspec-system/result'
-require 'rspec-system/internal_helpers'
 require 'timeout'
 
 module RSpecSystem
@@ -16,8 +15,6 @@ module RSpecSystem
   #
   # @abstract Subclass and override methods to create a helper object
   class Helper
-    include RSpecSystem::InternalHelpers
-
     # Cache of previous result data
     # @api private
     attr_reader :rd
@@ -169,7 +166,7 @@ module RSpecSystem
 
     # Return default node
     def default_node
-      rspec_system_node_set.default_node
+      RSpecSystem::NodeSet.create.default_node
     end
 
     # Returns a node by its name.
@@ -179,7 +176,7 @@ module RSpecSystem
     # @param name [String] name of the node
     # @return [RSpecSystem::Node] node found
     def get_node_by_name(name)
-      rspec_system_node_set.nodes[name]
+      RSpecSystem::NodeSet.create.nodes[name]
     end
   end
 end

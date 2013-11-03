@@ -10,7 +10,7 @@ module RSpecSystem
   class NodeSet::Vsphere < RSpecSystem::NodeSet::Base
     include RSpecSystem::Log
 
-    ENV_TYPE = 'vsphere'
+    PROVIDER_TYPE = 'vsphere'
 
     attr_reader :vmconf
 
@@ -26,8 +26,7 @@ module RSpecSystem
       # Valid supported ENV variables
       options = [:host, :user, :pass, :dest_dir, :template_dir, :rpool,
         :cluster, :ssh_keys, :datacenter, :node_timeout, :node_tries,
-        :node_sleep, :ssh_timeout, :ssh_tries, :ssh_sleep, :connect_timeout,
-        :connect_tries]
+        :node_sleep, :connect_timeout, :connect_tries]
 
       # Devise defaults, use fog configuration from file system if it exists
       defaults = load_fog_config()
@@ -35,9 +34,6 @@ module RSpecSystem
         :node_timeout => 1200,
         :node_tries => 10,
         :node_sleep => 30 + rand(60),
-        :ssh_timeout => 60,
-        :ssh_tries => 10,
-        :ssh_sleep => 4,
         :connect_timeout => 60,
         :connect_tries => 10,
       })
@@ -45,8 +41,8 @@ module RSpecSystem
       # Traverse the ENV variables and load them into our config automatically
       @vmconf = defaults
       ENV.each do |k,v|
-        next unless k =~/^RSPEC_VSPHERE_/
-        var = k.sub(/^RSPEC_VSPHERE_/, '').downcase.to_sym
+        next unless k =~/^RS(PEC)?_VSPHERE_/
+        var = k.sub(/^RS(PEC)?_VSPHERE_/, '').downcase.to_sym
         unless options.include?(var)
           log.info("Ignoring unknown environment variable #{k}")
           next
@@ -55,7 +51,7 @@ module RSpecSystem
       end
 
       # Initialize node storage if not already
-      RSpec.configuration.rspec_storage[:nodes] ||= {}
+      RSpec.configuration.rs_storage[:nodes] ||= {}
     end
 
     # Retrieves fog configuration if it exists
@@ -82,7 +78,7 @@ module RSpecSystem
     # The connection handling automatically retries upon failure.
     #
     # @api private
-    def with_connection(&block)
+    def with_vsphere_connection(&block)
       vim = nil
       dc = nil
 
@@ -122,11 +118,11 @@ module RSpecSystem
 
     # @!group NodeSet Methods
 
-    # Setup the NodeSet by starting all nodes.
+    # Launch the nodes
     #
     # @return [void]
-    def setup
-      with_connection do |dc|
+    def launch
+      with_vsphere_connection do |dc|
         # Traverse folders to find target folder for new vm's and template
         # folders. Automatically create the destination folder if it doesn't
         # exist.
@@ -148,10 +144,7 @@ module RSpecSystem
 
         log.info "Launching VSphere instances one by one"
         nodes.each do |k,v|
-          #####################
-          # Node launching step
-          #####################
-          RSpec.configuration.rspec_storage[:nodes][k] ||= {}
+          RSpec.configuration.rs_storage[:nodes][k] ||= {}
 
           # Obtain the template name to use
           ps = v.provider_specifics['vsphere']
@@ -165,7 +158,7 @@ module RSpecSystem
 
           # Create a random name for the new VM
           vm_name = "rspec-system-#{k}-#{random_string(10)}"
-          RSpec.configuration.rspec_storage[:nodes][k][:vm] = vm_name
+          RSpec.configuration.rs_storage[:nodes][k][:vm] = vm_name
 
           log.info "Launching VSphere instance #{k} with template #{vmconf[:template_dir]}/#{template} as #{vmconf[:dest_dir]}/#{vm_name}"
 
@@ -201,7 +194,7 @@ module RSpecSystem
               time3 = Time.now
               log.info "#{k}> Time in seconds waiting for IP: #{time3 - time2}"
             end
-            RSpec.configuration.rspec_storage[:nodes][k][:ipaddress] = ipaddress
+            RSpec.configuration.rs_storage[:nodes][k][:ipaddress] = ipaddress
           rescue Timeout::Error, SystemCallError => e
             tries += 1
             log.error("VM launch attempt #{tries} failed with: " + e.message)
@@ -227,47 +220,31 @@ module RSpecSystem
               raise e
             end
           end
+
           time2 = Time.now
           log.info "#{k}> Took #{time2 - start_time} seconds to boot instance"
-
-          #####################
-          # SSH Step
-          #####################
-          tries = 0
-          begin
-            timeout(vmconf[:ssh_timeout]) do
-              output << bold(color("localhost$", :green)) << " ssh #{k}\n"
-              chan = Net::SSH.start(ipaddress, 'root', {
-                :keys => vmconf[:ssh_keys].split(":"),
-              })
-
-              RSpec.configuration.rspec_storage[:nodes][k][:ssh] = chan
-            end
-          rescue Timeout::Error, SystemCallError => e
-            tries += 1
-            output << e.message << "\n"
-            if tries < vmconf[:ssh_tries]
-              log.info("Sleeping for #{vmconf[:ssh_sleep]} seconds then trying again ...")
-              sleep vmconf[:ssh_sleep]
-              retry
-            else
-              log.error("Inability to connect to host, already tried #{tries} times, throwing exception")
-              raise e
-            end
-          end
-          time3 = Time.now
-          log.info "#{k}> Took #{time3 - start_time} seconds for instance to be ready"
-
-          ######################
-          # Do initial box setup
-          ######################
-          hosts = <<-EOS
-127.0.0.1 localhost localhost.localdomain
-#{ipaddress}  #{k}
-          EOS
-          shell(:n => k, :c => "echo '#{hosts}' > /etc/hosts")
-          shell(:n => k, :c => "hostname #{k}")
         end
+      end
+
+      nil
+    end
+
+    # Connect to the nodes
+    #
+    # @return [void]
+    def connect
+      nodes.each do |k,v|
+        rs_storage = RSpec.configuration.rs_storage[:nodes][k]
+        raise RuntimeError, "No internal storage for node #{k}" if rs_storage.nil?
+
+        ipaddress = rs_storage[:ipaddress]
+        raise RuntimeError, "No ipaddress provided from launch phase for node #{k}" if ipaddress.nil?
+
+        chan = ssh_connect(:host => k, :user => 'root', :net_ssh_options => {
+          :keys => vmconf[:ssh_keys].split(":"),
+          :host_name => ipaddress,
+        })
+        RSpec.configuration.rs_storage[:nodes][k][:ssh] = chan
       end
 
       nil
@@ -277,9 +254,9 @@ module RSpecSystem
     #
     # @return [void]
     def teardown
-      with_connection do |dc|
+      with_vsphere_connection do |dc|
         nodes.each do |k,v|
-          storage = RSpec.configuration.rspec_storage[:nodes][k]
+          storage = RSpec.configuration.rs_storage[:nodes][k]
 
           if storage.nil?
             log.info "No entry for node #{k}, no teardown necessary"
@@ -323,43 +300,6 @@ module RSpecSystem
       end
 
       nil
-    end
-
-    # Run a command on a host in the NodeSet.
-    #
-    # @param opts [Hash] options
-    # @return [Hash] a hash containing :exit_code, :stdout and :stderr
-    def run(opts)
-      dest = opts[:n].name
-      cmd = opts[:c]
-
-      ssh = RSpec.configuration.rspec_storage[:nodes][dest][:ssh]
-      ssh_exec!(ssh, cmd)
-    end
-
-    # Transfer files to a host in the NodeSet.
-    #
-    # @param opts [Hash] options
-    # @return [Boolean] returns true if command succeeded, false otherwise
-    # @todo This is damn ugly, because we ssh in as vagrant, we copy to a temp
-    #   path then move it later. Its slow and brittle and we need a better
-    #   solution. Its also very Linux-centrix in its use of temp dirs.
-    def rcp(opts)
-      dest = opts[:d].name
-      source = opts[:sp]
-      dest_path = opts[:dp]
-
-      # Do the copy and print out results for debugging
-      ssh = RSpec.configuration.rspec_storage[:nodes][dest][:ssh]
-
-      begin
-        ssh.scp.upload! source.to_s, dest_path.to_s, :recursive => true
-      rescue => e
-        log.error("Error with scp of file #{source} to #{dest}:#{dest_path}")
-        raise e
-      end
-
-      true
     end
 
   end

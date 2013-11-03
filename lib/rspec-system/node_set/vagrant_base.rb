@@ -5,13 +5,22 @@ require 'net/scp'
 require 'rspec-system/node_set/base'
 
 module RSpecSystem
-  # A NodeSet implementation for Vagrant.
-  class NodeSet::Vagrant < RSpecSystem::NodeSet::Base
+  # An abstract NodeSet implementation for Vagrant.
+  class NodeSet::VagrantBase < RSpecSystem::NodeSet::Base
     include RSpecSystem::Log
     include RSpecSystem::Util
 
-    ENV_TYPE = 'vagrant'
-    VALID_VM_OPTIONS = ['ip']
+    # @!group Abstract Methods
+
+    # The vagrant specific provider name
+    #
+    # @return [String] name of the provider as used by `vagrant --provider`
+    # @abstract override to return the name of the vagrant provider
+    def vagrant_provider_name
+      raise RuntimeError, "Unimplemented method #vagrant_provider_name"
+    end
+
+    # @!group Common Methods
 
     # Creates a new instance of RSpecSystem::NodeSet::Vagrant
     #
@@ -21,30 +30,49 @@ module RSpecSystem
     # @param options [Hash] options Hash
     def initialize(setname, config, custom_prefabs_path, options)
       super
-      @vagrant_path = File.expand_path(File.join(RSpec.configuration.system_tmp, 'vagrant_projects', setname))
+      @vagrant_path = File.expand_path(File.join(RSpec.configuration.rs_tmp, 'vagrant_projects', setname))
 
-      RSpec.configuration.rspec_storage[:nodes] ||= {}
+      RSpec.configuration.rs_storage[:nodes] ||= {}
     end
 
-    # Setup the NodeSet by starting all nodes.
+    # Launch the nodes
     #
     # @return [void]
-    def setup
+    def launch
       create_vagrantfile()
 
       teardown()
 
-      output << bold(color("localhost$", :green)) << " vagrant up\n"
-      vagrant("up")
-
-      # Establish ssh connectivity
       nodes.each do |k,v|
-        output << bold(color("localhost$", :green)) << " ssh #{k}\n"
-        chan = Net::SSH.start(k, 'vagrant', :config => ssh_config)
+        RSpec.configuration.rs_storage[:nodes][k] ||= {}
+        output << bold(color("localhost$", :green)) << " vagrant up #{k}\n"
+        vagrant("up #{k} --provider=#{vagrant_provider_name}")
+      end
 
-        RSpec.configuration.rspec_storage[:nodes][k] = {
-          :ssh => chan,
-        }
+      nil
+    end
+
+    # Connect to the nodes
+    #
+    # @return [void]
+    def connect
+      nodes.each do |k,v|
+        RSpec.configuration.rs_storage[:nodes][k] ||= {}
+
+        chan = ssh_connect(:host => k, :user => 'vagrant', :net_ssh_options => {
+          :config => ssh_config
+        })
+
+        # Copy the authorized keys from vagrant user to root then reconnect
+        cmd = 'mkdir /root/.ssh ; cp /home/vagrant/.ssh/authorized_keys /root/.ssh'
+
+        output << bold(color("#{k}$ ", :green)) << cmd << "\n"
+        ssh_exec!(chan, "cd /tmp && sudo sh -c #{shellescape(cmd)}")
+
+        chan = ssh_connect(:host => k, :user => 'root', :net_ssh_options => {
+          :config => ssh_config
+        })
+        RSpec.configuration.rs_storage[:nodes][k][:ssh] = chan
       end
 
       nil
@@ -55,7 +83,7 @@ module RSpecSystem
     # @return [void]
     def teardown
       nodes.each do |k,v|
-        storage = RSpec.configuration.rspec_storage[:nodes][k]
+        storage = RSpec.configuration.rs_storage[:nodes][k]
 
         next if storage.nil?
 
@@ -67,45 +95,8 @@ module RSpecSystem
         output << bold(color("localhost$", :green)) << " vagrant destroy --force\n"
         vagrant("destroy --force")
       end
+
       nil
-    end
-
-    # Run a command on a host in the NodeSet.
-    #
-    # @param opts [Hash] options
-    # @return [Hash] a hash containing :exit_code, :stdout and :stderr
-    def run(opts)
-      dest = opts[:n].name
-      cmd = opts[:c]
-
-      ssh = RSpec.configuration.rspec_storage[:nodes][dest][:ssh]
-      ssh_exec!(ssh, "cd /tmp && sudo sh -c #{shellescape(cmd)}")
-    end
-
-    # Transfer files to a host in the NodeSet.
-    #
-    # @param opts [Hash] options
-    # @return [Boolean] returns true if command succeeded, false otherwise
-    # @todo This is damn ugly, because we ssh in as vagrant, we copy to a temp
-    #   path then move it later. Its slow and brittle and we need a better
-    #   solution. Its also very Linux-centrix in its use of temp dirs.
-    def rcp(opts)
-      dest = opts[:d].name
-      source = opts[:sp]
-      dest_path = opts[:dp]
-
-      # Grab a remote path for temp transfer
-      tmpdest = tmppath
-
-      # Do the copy and print out results for debugging
-      cmd = "scp -r '#{source}' #{dest}:#{tmpdest}"
-      output << bold(color("localhost$", :green)) << " #{cmd}\n"
-      ssh = RSpec.configuration.rspec_storage[:nodes][dest][:ssh]
-      ssh.scp.upload! source.to_s, tmpdest.to_s, :recursive => true
-
-      # Now we move the file into their final destination
-      result = shell(:n => opts[:d], :c => "mv #{tmpdest} #{dest_path}")
-      result[:exit_code] == 0
     end
 
     # Create the Vagrantfile for the NodeSet.
@@ -117,7 +108,7 @@ module RSpecSystem
       File.open(File.expand_path(File.join(@vagrant_path, "Vagrantfile")), 'w') do |f|
         f.write('Vagrant.configure("2") do |c|' + "\n")
         nodes.each do |k,v|
-          ps = v.provider_specifics['vagrant']
+          ps = v.provider_specifics[provider_type]
           default_options = { 'mac' => randmac }
           options = default_options.merge(v.options || {})
 
@@ -126,8 +117,8 @@ module RSpecSystem
           node_config << "    v.vm.box = '#{ps['box']}'\n"
           node_config << "    v.vm.box_url = '#{ps['box_url']}'\n" unless ps['box_url'].nil?
           node_config << customize_vm(k,options)
-          node_config << "    v.vm.provider 'virtualbox' do |vbox|\n"
-          node_config << customize_virtualbox(k,options)
+          node_config << "    v.vm.provider '#{vagrant_provider_name}' do |prov, override|\n"
+          node_config << customize_provider(k,options)
           node_config << "    end\n"
           node_config << "  end\n"
 
@@ -138,26 +129,15 @@ module RSpecSystem
       nil
     end
 
-    # Adds virtualbox customization to the Vagrantfile
+    # Add provider specific customization to the Vagrantfile
     #
     # @api private
     # @param name [String] name of the node
     # @param options [Hash] customization options
-    # @return [String] a series of vbox.customize lines
-    def customize_virtualbox(name,options)
-      custom_config = ""
-      options.each_pair do |key,value|
-        next if VALID_VM_OPTIONS.include?(key)
-        case key
-        when 'cpus','memory'
-          custom_config << "    vbox.customize ['modifyvm', :id, '--#{key}','#{value}']\n"
-        when 'mac'
-          custom_config << "    vbox.customize ['modifyvm', :id, '--macaddress1','#{value}']\n"
-        else
-          log.warn("Skipped invalid custom option for node #{name}: #{key}=#{value}")
-        end
-      end
-      custom_config
+    # @return [String] a series of prov.customize lines
+    # @abstract Overridet ot provide your own customizations
+    def customize_provider(name,options)
+      ''
     end
 
     # Adds VM customization to the Vagrantfile
@@ -193,7 +173,7 @@ module RSpecSystem
       end
       self.nodes.each do |k,v|
         Dir.chdir(@vagrant_path) do
-          systemu("vagrant ssh-config #{k} >> #{ssh_config_path}")
+          result = systemu("vagrant ssh-config #{k} >> #{ssh_config_path}")
         end
       end
       ssh_config_path
@@ -203,14 +183,19 @@ module RSpecSystem
     #
     # @api private
     # @param args [String] args to vagrant
-    # @todo This seems a little too specific these days, might want to
-    #   generalize. It doesn't use systemu, because we want to see the output
-    #   immediately, but still - maybe we can make systemu do that.
     def vagrant(args)
       Dir.chdir(@vagrant_path) do
         system("vagrant #{args}")
       end
       nil
+    end
+
+    # Returns a list of options that apply to all types of vagrant providers
+    #
+    # @return [Array<String>] Array of options
+    # @api private
+    def global_vagrant_options
+      ['ip']
     end
 
   end
