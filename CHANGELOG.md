@@ -1,3 +1,27 @@
+2.6.0
+=====
+
+This is a feature release that improves a number of areas:
+
+* Split out vagrant commonalities into a vagrant_base class
+* Add support for vagrant-vmware_fusion
+* Fix vagrant so we log in as root, not log in as vagrant and sudo
+* Break out steps in providers: launch, connect, configure
+* Generalise the SSH connection routines
+* Provide a series of global configuration steps, like ntp sync, hostname
+  fixups etc.
+* Deprecated the internal_helpers module, its better to avoid global
+  methods anyway
+* Switched to using RS_ as the prefix for environment variables
+
+#### Detailed Changes
+
+* Refactor with some new features (Ken Barber)
+* fix multi-node sample in readme (Pall Valmundsson)
+* remove unnecessary if statment (Johan Haals)
+
+-------------------------------
+
 2.5.1
 =====
 
