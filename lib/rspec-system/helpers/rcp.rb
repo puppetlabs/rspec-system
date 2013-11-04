@@ -7,7 +7,7 @@ module RSpecSystem::Helpers
     properties :success
 
     def initialize(opts, clr, &block)
-      ns = rspec_system_node_set
+      ns = RSpecSystem::NodeSet.create
       opts = {
         :source_path => opts[:sp],
         :destination_path => opts[:dp],
@@ -32,10 +32,7 @@ module RSpecSystem::Helpers
 
     # Gathers new results by executing the resource action
     def execute
-      ns = rspec_system_node_set
-      d = opts[:d]
-      sp = opts[:sp]
-      dp = opts[:dp]
+      ns = RSpecSystem::NodeSet.create
 
       result = ns.rcp(opts)
       { :success => result }

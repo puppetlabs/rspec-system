@@ -164,7 +164,7 @@ module RSpecSystem::Helpers
   # @option options [String] :name the canonical name of the node
   # @return [RSpecSystem::Node] node object
   def node(options = {})
-    ns = rspec_system_node_set
+    ns = RSpecSystem::NodeSet.create
     options = {
       :name => ns.default_node.name,
     }.merge(options)

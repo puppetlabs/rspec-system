@@ -1,27 +1,4 @@
 ---
-'centos-58-x64':
-  description: "Vagrant images obtained from http://puppet-vagrant-boxes.puppetlabs.com"
-  facts:
-    architecture: x86_64
-    facterversion: "1.6.17"
-    kernel: Linux
-    kernelmajversion: "2.6"
-    kernelrelease: "2.6.18-308.el5"
-    kernelversion: "2.6.18"
-    lsbdistcodename: Final
-    lsbdistdescription: "CentOS release 5.8 (Final)"
-    lsbdistid: CentOS
-    lsbdistrelease: "5.8"
-    lsbmajdistrelease: "5"
-    lsbrelease: ":core-4.0-amd64:core-4.0-ia32:core-4.0-noarch:graphics-4.0-amd64:graphics-4.0-ia32:graphics-4.0-noarch:printing-4.0-amd64:printing-4.0-ia32:printing-4.0-noarch"
-    operatingsystem: CentOS
-    operatingsystemrelease: "5.8"
-    osfamily: RedHat
-    rubyversion: "1.9.2"
-  provider_specifics:
-    vagrant:
-      box: 'centos-58-x64'
-      box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/centos-58-x64.box'
 'centos-59-x64':
   description: "Vagrant images obtained from http://puppet-vagrant-boxes.puppetlabs.com"
   facts:
@@ -42,33 +19,11 @@
     osfamily: RedHat
     rubyversion: "1.9.2"
   provider_specifics:
-    vagrant:
+    vagrant_virtualbox:
       box: 'centos-59-x64-vbox4210-nocm'
       box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/centos-59-x64-vbox4210-nocm.box'
     vsphere:
       template: 'centos-5-x86_64'
-'centos-63-x64':
-  description: "Vagrant images obtained from http://puppet-vagrant-boxes.puppetlabs.com"
-  facts:
-    architecture: x86_64
-    facterversion: "1.6.17"
-    kernel: Linux
-    kernelversion: "2.6.32"
-    kernelrelease: "2.6.32-279.el6.x86_64"
-    lsbmajdistrelease: "6"
-    lsbdistcodename: Final
-    lsbdistdescription: "CentOS release 6.3 (Final)"
-    lsbdistid: CentOS
-    lsbdistrelease: "6.3"
-    operatingsystem: CentOS
-    operatingsystemrelease: "6.3"
-    osfamily: RedHat
-    kernelmajversion: "2.6"
-    rubyversion: "1.8.7"
-  provider_specifics:
-    vagrant:
-      box: 'centos-63-x64'
-      box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/centos-63-x64.box'
 'centos-64-x64':
   description: ""
   facts:
@@ -88,9 +43,12 @@
     kernel: Linux
     rubyversion: "1.8.7"
   provider_specifics:
-    vagrant:
+    vagrant_virtualbox:
       box: 'centos-64-x64-vbox4210-nocm'
       box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/centos-64-x64-vbox4210-nocm.box'
+    vagrant_vmware_fusion:
+      box: 'centos-64-x64-vf503-nocm'
+      box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/centos-64-x64-fusion503-nocm.box'
     vsphere:
       template: 'centos-6-x86_64'
 'fedora-18-x64':
@@ -110,30 +68,14 @@
     osfamily: RedHat
     rubyversion: 1.9.3
   provider_specifics:
-    vagrant:
+    vagrant_virtualbox:
       box: 'fedora-18-x64-vbox4210-nocm'
       box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/fedora-18-x64-vbox4210-nocm.box'
+    vagrant_vmware_fusion:
+      box: 'fedora-18-x64-vf503-nocm'
+      box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/fedora-18-x64-vf503-nocm.box'
     vsphere:
       template: 'fedora-18-x86_64'
-'debian-606-x64':
-  description: "Vagrant images obtained from http://puppet-vagrant-boxes.puppetlabs.com"
-  facts:
-    architecture: amd64
-    facterversion: "1.6.17"
-    kernel: Linux
-    kernelmajversion: "2.6"
-    kernelversion: "2.6.32"
-    lsbdistcodename: squeeze
-    lsbdistdescription: "Debian GNU/Linux 6.0.6 (squeeze)"
-    lsbdistid: Debian
-    lsbdistrelease: "6.0.6"
-    operatingsystem: Debian
-    osfamily: Debian
-    rubyversion: "1.8.7"
-  provider_specifics:
-    vagrant:
-      box: 'debian-606-x64'
-      box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/debian-606-x64.box'
 'debian-607-x64':
   description: ""
   facts:
@@ -153,9 +95,12 @@
     lsbdistid: Debian
     architecture: amd64
   provider_specifics:
-    vagrant:
+    vagrant_virtualbox:
       box: 'debian-607-x64-vbox4210-nocm'
       box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/debian-607-x64-vbox4210-nocm.box'
+    vagrant_vmware_fusion:
+      box: 'debian-607-x64-vf503-nocm'
+      box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/debian-607-x64-vf503-nocm.box'
     vsphere:
       template: 'debian-6-x86_64'
 'debian-70rc1-x64':
@@ -177,33 +122,14 @@
     osfamily: Debian
     rubyversion: "1.9.3"
   provider_specifics:
-    vagrant:
+    vagrant_virtualbox:
       box: 'debian-70rc1-x64-vbox4210-nocm'
       box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/debian-70rc1-x64-vbox4210-nocm.box'
+    vagrant_vmware_fusion:
+      box: 'debian-70rc1-x64-vf503-nocm'
+      box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/debian-70rc1-x64-vf503-nocm.box'
     vsphere:
       template: 'debian-7-x86_64'
-'ubuntu-server-1004-x64':
-  description: ''
-  facts:
-    kernel: Linux
-    operatingsystemrelease: "10.04"
-    lsbmajdistrelease: "10"
-    kernelrelease: "2.6.32-38-server"
-    osfamily: Debian
-    lsbdistrelease: "10.04"
-    lsbdistdescription: "Ubuntu 10.04.4 LTS"
-    kernelversion: "2.6.32"
-    lsbdistcodename: lucid
-    operatingsystem: Ubuntu
-    facterversion: "1.6.17"
-    kernelmajversion: "2.6"
-    architecture: amd64
-    rubyversion: "1.8.7"
-    lsbdistid: Ubuntu
-  provider_specifics:
-    vagrant:
-      box: 'ubuntu-server-1004-x64'
-      box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-1004-x64.box'
 'ubuntu-server-10044-x64':
   description: ""
   facts:
@@ -223,33 +149,14 @@
     rubyversion: "1.8.7"
     lsbdistid: Ubuntu
   provider_specifics:
-    vagrant:
+    vagrant_virtualbox:
       box: 'ubuntu-server-10044-x64-vbox4210-nocm'
       box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-10044-x64-vbox4210-nocm.box'
+    vagrant_vmware_fusion:
+      box: 'ubuntu-server-10044-x64-vf503-nocm'
+      box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-10044-x64-fusion503-nocm.box'
     vsphere:
       template: 'ubuntu-1004-x86_64'
-'ubuntu-server-1204-x64':
-  description: ''
-  facts:
-    kernel: Linux
-    architecture: amd64
-    operatingsystem: Ubuntu
-    lsbdistid: Ubuntu
-    facterversion: "1.6.17"
-    kernelmajversion: "3.2"
-    kernelrelease: "3.2.0-29-generic"
-    kernelversion: "3.2.0"
-    lsbdistcodename: precise
-    lsbdistdescription: "Ubuntu 12.04.1 LTS"
-    lsbdistrelease: "12.04"
-    lsbmajdistrelease: "12"
-    operatingsystemrelease: "12.04"
-    osfamily: Debian
-    rubyversion: "1.9.2"
-  provider_specifics:
-    vagrant:
-      box: 'ubuntu-server-1204-x64'
-      box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-1204-x64.box'
 'ubuntu-server-12042-x64':
   description: "Foo"
   facts:
@@ -269,9 +176,12 @@
     osfamily: Debian
     rubyversion: "1.9.3"
   provider_specifics:
-    vagrant:
+    vagrant_virtualbox:
       box: 'ubuntu-server-12042-x64-vbox4210-nocm'
       box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-12042-x64-vbox4210-nocm.box'
+    vagrant_vmware_fusion:
+      box: 'ubuntu-server-12042-x64-vf503-nocm'
+      box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-12042-x64-vf503-nocm.box'
     vsphere:
       template: 'ubuntu-1204-x86_64'
 'sles-11sp1-x64':
@@ -288,7 +198,7 @@
     rubyversion: "1.8.7"
     architecture: x86_64
   provider_specifics:
-    vagrant:
+    vagrant_virtualbox:
       box: 'sles-11sp1-x64-vbox4210-nocm'
       box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/sles-11sp1-x64-vbox4210-nocm.box'
     vsphere:

@@ -3,8 +3,6 @@ require 'rspec-system'
 module RSpecSystem
   # This class represents a node in a nodeset
   class Node
-    include RSpecSystem::InternalHelpers
-
     # Static helper for generating a node direct from the hash returned by
     # the nodeset YAML file.
     #
@@ -44,7 +42,7 @@ module RSpecSystem
         # TODO: do not support not prefabs yet
         raise "No prefab defined, bailing"
       else
-        @prefab = RSpecSystem::Prefab.prefab(prefab, custom_prefabs_path)
+        @prefab = RSpecSystem::Prefab.prefab(prefab, @custom_prefabs_path)
         @facts = @prefab.facts
         @provider_specifics = @prefab.provider_specifics
       end

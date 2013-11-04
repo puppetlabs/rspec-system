@@ -30,9 +30,83 @@ module RSpecSystem
     # Setup the NodeSet by starting all nodes.
     #
     # @return [void]
-    # @abstract Override this method and provide your own node launching code
     def setup
-      raise "Unimplemented method #setup"
+      launch
+      connect
+      configure
+    end
+
+    # Launch nodes
+    #
+    # @return [void]
+    # @abstract Override this method and provide your own launch code
+    def launch
+      raise RuntimeError "Unimplemented method #launch"
+    end
+
+    # Connect nodes
+    #
+    # @return [void]
+    # @abstract Override this method and provide your own connect code
+    def connect
+      raise RuntimeError "Unimplemented method #connect"
+    end
+
+    # Configure nodes
+    #
+    # This is the global configure method that sets up a node before tests are
+    # run, making sure any important preparation steps are executed.
+    #
+    # * fixup profile to stop using mesg to avoid extraneous noise
+    # * ntp synchronisation
+    # * hostname & hosts setup
+    #
+    # @return [void]
+    # @abstract Override this method and provide your own configure code
+    def configure
+      nodes.each do |k,v|
+        rs_storage = RSpec.configuration.rs_storage[:nodes][k]
+
+        # Fixup profile to avoid noise
+        if v.facts['osfamily'] == 'Debian'
+          shell(:n => k, :c => "sed -i 's/^mesg n/# mesg n/' /root/.profile")
+        end
+
+        # Setup ntp
+        if v.facts['osfamily'] == 'Debian' then
+          shell(:n => k, :c => 'apt-get install -y ntpdate')
+        elsif v.facts['osfamily'] == 'RedHat' then
+          if v.facts['lsbmajdistrelease'] == '5' then
+            shell(:n => k, :c => 'yum install -y ntp')
+          else
+            shell(:n => k, :c => 'yum install -y ntpdate')
+          end
+        end
+        shell(:n => k, :c => 'ntpdate -u pool.ntp.org')
+
+        # Grab IP address for host, if we don't already have one
+        rs_storage[:ipaddress] ||= shell(:n => k, :c => "ip a|awk '/g/{print$2}' | cut -d/ -f1 | head -1").stdout.chomp
+
+        # Configure local hostname and hosts file
+        shell(:n => k, :c => "hostname #{k}")
+
+        if v.facts['osfamily'] == 'Debian' then
+          shell(:n => k, :c => "echo '#{k}' > /etc/hostname")
+        end
+
+        hosts = <<-EOS
+#{rs_storage[:ipaddress]} #{k}
+127.0.0.1 #{k} localhost
+::1 #{k} localhost
+        EOS
+        shell(:n => k, :c => "echo '#{hosts}' > /etc/hosts")
+
+        # Display setup for diagnostics
+        shell(:n => k, :c => 'cat /etc/hosts')
+        shell(:n => k, :c => 'hostname')
+        shell(:n => k, :c => 'hostname -f')
+      end
+      nil
     end
 
     # Shutdown the NodeSet by shutting down or pausing all nodes.
@@ -40,7 +114,7 @@ module RSpecSystem
     # @return [void]
     # @abstract Override this method and provide your own node teardown code
     def teardown
-      raise "Unimplemented method #teardown"
+      raise RuntimeError "Unimplemented method #teardown"
     end
 
     # Run a command on a host in the NodeSet.
@@ -49,7 +123,11 @@ module RSpecSystem
     # @return [Hash] a hash containing :stderr, :stdout and :exit_code
     # @abstract Override this method providing your own shell running code
     def run(opts)
-      raise "Unimplemented method #run"
+      dest = opts[:n].name
+      cmd = opts[:c]
+
+      ssh = RSpec.configuration.rs_storage[:nodes][dest][:ssh]
+      ssh_exec!(ssh, cmd)
     end
 
     # Copy a file to the host in the NodeSet.
@@ -61,14 +139,28 @@ module RSpecSystem
     # @return [Boolean] returns true if command succeeded, false otherwise
     # @abstract Override this method providing your own file transfer code
     def rcp(opts)
-      raise "Unimplemented method #rcp"
+      dest = opts[:d].name
+      source = opts[:sp]
+      dest_path = opts[:dp]
+
+      # Do the copy and print out results for debugging
+      ssh = RSpec.configuration.rs_storage[:nodes][dest][:ssh]
+
+      begin
+        ssh.scp.upload! source.to_s, dest_path.to_s, :recursive => true
+      rescue => e
+        log.error("Error with scp of file #{source} to #{dest}:#{dest_path}")
+        raise e
+      end
+
+      true
     end
 
     # @!group Common Methods
 
     # Return environment type
-    def env_type
-      self.class::ENV_TYPE
+    def provider_type
+      self.class::PROVIDER_TYPE
     end
 
     # Return default node
@@ -103,6 +195,39 @@ module RSpecSystem
     #   least.
     def tmppath
       '/tmp/' + random_string
+    end
+
+    # Connect via SSH in a resilient way
+    #
+    # @param [Hash] opts
+    # @option opts [String] :host Host to connect to
+    # @option opts [String] :user User to connect as
+    # @option opts [Hash] :net_ssh_options Options hash as used by `Net::SSH.start`
+    # @return [Net::SSH::Connection::Session]
+    # @api protected
+    def ssh_connect(opts = {})
+      ssh_sleep = RSpec.configuration.rs_ssh_sleep
+      ssh_tries = RSpec.configuration.rs_ssh_tries
+      ssh_timeout = RSpec.configuration.rs_ssh_timeout
+
+      tries = 0
+      begin
+        timeout(ssh_timeout) do
+          output << bold(color("localhost$", :green)) << " ssh -l #{opts[:user]} #{opts[:host]}\n"
+          Net::SSH.start(opts[:host], opts[:user], opts[:net_ssh_options])
+        end
+      rescue Timeout::Error, SystemCallError => e
+        tries += 1
+        output << e.message << "\n"
+        if tries < ssh_tries
+          log.info("Sleeping for #{ssh_sleep} seconds then trying again ...")
+          sleep ssh_sleep
+          retry
+        else
+          log.error("Inability to connect to host, already tried #{tries} times, throwing exception")
+          raise e
+        end
+      end
     end
 
     # Execute command via SSH.

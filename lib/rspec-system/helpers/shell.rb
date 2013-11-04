@@ -35,7 +35,7 @@ module RSpecSystem::Helpers
       cmd = opts[:c]
 
       output << bold(color("#{dest}$", :green)) << " #{cmd}\n"
-      rspec_system_node_set.run(opts)
+      RSpecSystem::NodeSet.create.run(opts)
     end
   end
 end
