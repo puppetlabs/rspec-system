@@ -203,7 +203,7 @@ To define custom prefabs place a `.prefabs.yml` file in your project's root dire
         kernel: Linux
         rubyversion: "1.8.7"
       provider_specifics:
-        vagrant:
+        vagrant_virtualbox:
           box: 'scientific-64-x64-vb4210-nocm'
           box_url: 'http://example.com/path/to/scientific-64-x64-vb4210-nocm.box'
 
@@ -216,7 +216,7 @@ For example, to use a different box for CentOS 6.4 x64, you can override the `bo
     ---
     'centos-64-x64':
       provider_specifics:
-        vagrant:
+        vagrant_virtualbox:
           box: 'centos-64-x64-vbox4210'
           box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/centos-64-x64-vbox4210.box'
 
@@ -229,7 +229,25 @@ There are two providers at the moment you can use to launch your nodes for testi
 
 Although both systems can be used for either purpose, if you so desire.
 
-#### Vagrant Provider
+Instead of switches, we use a number of environment variables to modify the behaviour of running tests. This is more inline with the way testing frameworks like Jenkins work, and should be pretty easy for command line users as well:
+
+* *RS_PROVIDER* - defines the nodeset provider, for now `vagrant_virtualbox` is the default.
+* *RS_SET* - the set to use when running tests (defaults to the `default_set` setting in the projects `.nodeset.yml` file). This string must align with the entries under `sets` in your `.nodeset.yml`.
+* *RS_DESTROY* - set this to `no` if you do not want your nodes to be destroyed before or after a test completes.  May be useful during initial testing of rspec tests to allow inspection of the node.
+* *RS_TMP* - This patch is used for various temporary content. Default is the directory `.rspec_system` in your projects root.
+* *RS_SSH_TRIES* - Number of attempts to connect to a node using SSH. Defaults to 10.
+* *RS_SSH_SLEEP* - Number of seconds between attempts. Defaults to 4.
+* *RS_SSH_TIMEOUT* - Timeout for attempting SSH connectivity. Defaults to 60.
+
+So if you wanted to run an alternate nodeset you could use:
+
+    RS_SET=fedora18 bundle exec rake spec:system
+
+In Jenkins you should be able to use RS\_SET in a test matrix, thus obtaining quite a nice integration and visual display of nodesets in Jenkins.
+
+#### Vagrant Virtualbox
+
+    RS_PROVIDER='vagrant_virtualbox'
 
 This is the default provider, as all the products for this provider are free, most people should be able to run it.
 
@@ -244,57 +262,49 @@ Once these are ready, you can Run the system tests with:
 
 The VM's should be downloaded from the internet, started and tests should run.
 
-Instead of switches, we use a number of environment variables to modify the behaviour of running tests. This is more inline with the way testing frameworks like Jenkins work, and should be pretty easy for command line users as well:
+#### Vagrant VMware Fusion
 
-* *RSPEC_VIRTUAL_ENV* - set this to `vagrant` if you wish, for now `vagrant` is the default so this is optional.
-* *RSPEC_SET* - the set to use when running tests (defaults to the `default_set` setting in the projects `.nodeset.yml` file). This string must align with the entries under `sets` in your `.nodeset.yml`.
-* *RSPEC_DESTROY* - set this to `no` if you do not want the VM to be destroyed before or after a test completes.  May be useful during initial testing of rspec tests to allow inspection of the VM.
-* *RSPEC_SYSTEM_TMP* - Sets the path to create vagrant_projects directory containing each Nodeset's Vagrantfile.  Default is the directory `.rspec_system` in your projects root.
+    RS_PROVIDER='vagrant_vmware_fusion'
 
-So if you wanted to run an alternate nodeset you could use:
+Make sure you have already installed:
 
-    RSPEC_SET=fedora18 bundle exec rake spec:system
+* VirtualBox 4.2.10+
+* VMware Fusion 5.0.3+
 
-In Jenkins you should be able to use RSPEC\_SET in a test matrix, thus obtaining quite a nice integration and visual display of nodesets in Jenkins.
+Once these are ready, you can Run the system tests with:
 
-To set the location of the Nodeset's Vagrantfile to `/tmp/vagrant_projects/centos-64-x64` you could use:
+    RS_PROVIDER='vagrant_vmware_fusion' bundle exec rake spec:system
 
-    RSPEC_SET=centos-64-x64 RSPEC_SYSTEM_TMP=/tmp rake spec:system
+The VM's should be downloaded from the internet, started and tests should run.
 
-#### VSphere Provider
+#### VSphere
 
-*Note:* this provider requires some templates to be created in a globally accessable folder somewhere in your VSphere system, in the near future the site: <http://puppet-vagrant-boxes.puppetlabs.com> should provide you with deployable OVF files for this purpose, and I'll provide you with better docs on how to load these ;-). Look at prefabs.yml for the names of the templates that we expect.
+    RS_PROVIDER='vsphere'
 
 This provider will launch nodes using VMWare VSphere API's and use those for running tests. This provider is really aimed at the users who want to use this library within their own CI system for example, as apposed to developers who wish to run tests locally themselves.
 
 This provider has a lot more options for setup, in the form of environment variables:
 
-* *RSPEC_VIRTUAL_ENV* - set this to 'vsphere' to use this provider
-* *RSPEC_SET* - same as the vagrant provider, this defines the 'set' to launch.
-* *RSPEC_DESTROY* - same as the vagrant provider, defines if the VM should be destroyed before and after a test.
-* *RSPEC_VSPHERE_HOST* - hostname of your vsphere api
-* *RSPEC_VSPHERE_USER* - username to authenticate with
-* *RSPEC_VSPHERE_PASS* - password to authenticate with
-* *RSPEC_VSPHERE_DEST_DIR* - destination path to launch vm's
-* *RSPEC_VSPHERE_TEMPLATE_DIR* - path to where you deployed the templates from the OVF files described above
-* *RSPEC_VSPHERE_RPOOL* - name of resource pool to use
-* *RSPEC_VSPHERE_CLUSTER* - name of the cluster to use
-* *RSPEC_VSPHERE_SSH_KEYS* - path to private key for authentication. Multiple paths may be provided using a colon separator.
-* *RSPEC_VSPHERE_DATACENTER* - optional name of VSphere data centre
-* *RSPEC_VSPHERE_NODE_TIMEOUT* - amount of seconds before trying to relaunch a node. Defaults to 1200.
-* *RSPEC_VSPHERE_NODE_TRIES* - amount of attempts to relaunch a node. Defaults to 10.
-* *RSPEC_VSPHERE_NODE_SLEEP* - amount of seconds to sleep for before trying again. Defaults to a random number between 30 and 90.
-* *RSPEC_VSPHERE_SSH_TIMEOUT* - amount of seconds before retrying to SSH into a node. Default to 60.
-* *RSPEC_VSPHERE_SSH_TRIES* - amount of attempts to SSH into a node. Defaults to 10.
-* *RSPEC_VSPHERE_SSH_SLEEP* - amount of seconds to sleep before trying to SSH again. Defaults to 4.
-* *RSPEC_VSPHERE_CONNECT_TIMEOUT* - amount of seconds before retrying to connect to the VSphere API. Defaults to 60.
-* *RSPEC_VSPHERE_CONNECT_TRIES* - amount of attempts to connect to the VSphere API. Defaults to 10.
+* *RS_VSPHERE_HOST* - hostname of your vsphere api
+* *RS_VSPHERE_USER* - username to authenticate with
+* *RS_VSPHERE_PASS* - password to authenticate with
+* *RS_VSPHERE_DEST_DIR* - destination path to launch vm's
+* *RS_VSPHERE_TEMPLATE_DIR* - path to where you deployed the templates from the OVF files described above
+* *RS_VSPHERE_RPOOL* - name of resource pool to use
+* *RS_VSPHERE_CLUSTER* - name of the cluster to use
+* *RS_VSPHERE_SSH_KEYS* - path to private key for authentication. Multiple paths may be provided using a colon separator.
+* *RS_VSPHERE_DATACENTER* - optional name of VSphere data centre
+* *RS_VSPHERE_NODE_TIMEOUT* - amount of seconds before trying to relaunch a node. Defaults to 1200.
+* *RS_VSPHERE_NODE_TRIES* - amount of attempts to relaunch a node. Defaults to 10.
+* *RS_VSPHERE_NODE_SLEEP* - amount of seconds to sleep for before trying again. Defaults to a random number between 30 and 90.
+* *RS_VSPHERE_CONNECT_TIMEOUT* - amount of seconds before retrying to connect to the VSphere API. Defaults to 60.
+* *RS_VSPHERE_CONNECT_TRIES* - amount of attempts to connect to the VSphere API. Defaults to 10.
 
-Set these variables, and run the usual rake command:
+Set these variables, and run the usual rake command specifying the provider:
 
-    bundle exec rake spec:system
+    RS_PROVIDER='vsphere' bundle exec rake spec:system
 
-In Jenkins, set the authentication variables above using environment variable injection. I recommend using the private environment variables feature for user & pass however so these do not get displayed in the console output. As with the vagrant provider however, turn RSPEC\_SET into a test matrix, containing all the sets you want to test against.
+In Jenkins, set the authentication variables above using environment variable injection. I recommend using the private environment variables feature for user & pass however so these do not get displayed in the console output. As with the vagrant provider however, turn RS\_SET into a test matrix, containing all the sets you want to test against.
 
 ### Plugins to rspec-system
 
@@ -311,15 +321,20 @@ Libraries that provide test helpers, and setup helpers for testing development o
 
 A node provider should provide the ability to launch nodes (or if they are already launched provide information to get to them), run commands on nodes, transfer files and shutdown nodes. That is, abstractions around other virtualisation, cloud or system tools.
 
-Right now the two options are: vagrant & vsphere and these are installed with core. In the future we probably want to split these out to plugins, but the plugin system isn't quite ready for that yet.
+Right now the options are:
+
+* vagrant\_virtualbox
+* vagrant\_vmware\_fusion
+* vsphere
+
+... and these are installed with core. In the future we probably want to split these out to plugins, but the plugin system isn't quite ready for that yet.
 
 #### The Future of Plugins
 
 I want to start an eco-system of plugins for rspec-system, but do it in a sane way. Right now I see the following potential plugin types, if you think you can help please do:
 
 * node providers - that is, abstractions around other virtualisation, cloud or system tools. Right now a NodeSet is tied to a virtual type, but I think this isn't granual enough. Some ideas for future providers are:
-    * blimpy - for firing up EC2 and OpenStack nodes, useful for Jenkins integration
-    * vmware fusion - for using vmware fusion with vagrant
+    * other vagrant plugins - it should be reasonably easy to extend support out to new vagrant plugins, since most of the example plugins are already using a simple pattern to do this.
     * razor - for launching bare metail nodes for testing purposes. Could be really useful to have baremetal tests for software that needs it like `facter`.
     * manual - not everything has to be 'launched' I can see a need for defining a static configuration for older machines that can't be poked and peeked. Of course, we might need to add cleanup tasks for this case.
 * helper libraries - libraries that provide test helpers, and setup helpers for testing development on the software in question.
@@ -335,9 +350,9 @@ These could be shipped as external gems, and plugged in to the rspec-system fram
 
 So currently I've only integrated this with Jenkins. If you have luck doing it on other CI platforms, feel free to add to this documentation.
 
-#### Jenkins and the Vagrant provider
+#### Jenkins
 
-My setup was:
+For virtualbox the setup tested with was:
 
 * Single box - 32GB of RAM and 8 cpus
 * Debian 7
@@ -346,28 +361,7 @@ My setup was:
 * VirtualBox 4.2.10 (installed via packages from virtualbox)
 * RVM with Ruby 2.0.0
 
-The setup for a job is basically:
-
-* Setup your slave box to only have 1 executor (there is some bug here, something to do with vagrant not liking multiple projects)
-* Create new matrix build
-* Specify VCS settings etc. as per normal
-* Create a user defined axis called 'RSPEC_SET' and add your nodesets in there: fedora-18-x64, centos-64-x64 etc.
-* Use touchstone with a filter of RSPEC_SET=='centos-64-x64' so you don't chew up cycles running a whole batch of broken builds
-* Create an execute shell job like so:
-
-        #!/bin/bash
-        set +e
-    
-        [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
-        rvm use ruby-2.0.0
-        bundle install --path vendor/bundle
-        bundle exec rake spec:system
-
-I went quite complex and had Github pull request integration working with this, and quite a few other nice features. If you need help setting it up get in touch.
-
-#### Jenkins and the VSphere provider
-
-My setup was:
+Or for VSphere:
 
 * Debian 7
 * Jenkins 1.510
@@ -377,16 +371,17 @@ The setup for a job is basically:
 
 * Create new matrix build
 * Specify VCS settings etc. as per normal
-* Create a user defined axis called 'RSPEC\_SET' and add your nodesets in there: fedora-18-x64, centos-64-x64 etc.
-* Use the enviornment injection facility to add all the other RSPEC\_VSPHERE vars as above
-* Use touchstone with a filter of RSPEC\_SET=='centos-64-x64' so you don't chew up cycles running a whole batch of broken builds
+* Create a user defined axis called 'RS\_SET' and add your nodesets in there: fedora-18-x64, centos-64-x64 etc.
+* Use touchstone with a filter of RS\_SET=='centos-64-x64' so you don't chew up cycles running a whole batch of broken builds
+* For the provider in question, make sure you have provided any custom configuration. For example VSphere requires a bunch of RS\_VSPHERE\_\* variables to be set. Make sure these are set using the environment variable injection facility.
 * Create an execute shell job like so:
 
         #!/bin/bash
         set +e
+
         [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
         rvm use ruby-2.0.0
         bundle install --path vendor/bundle
         bundle exec rake spec:system
 
-Basically the results were quite nice, as apposed to the 'vagrant' provider I was able to achieve running parallel jobs using my matrix setup.
+I went quite complex and had Github pull request integration working with this, and quite a few other nice features. If you need help setting it up get in touch.
