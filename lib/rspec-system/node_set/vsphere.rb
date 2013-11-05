@@ -135,7 +135,10 @@ module RSpecSystem
         rp = dc.find_compute_resource(vmconf[:cluster]).
                 resourcePool.
                 traverse(vmconf[:rpool])
-        relocateSpec = RbVmomi::VIM.VirtualMachineRelocateSpec(:pool => rp)
+        relocateSpec = RbVmomi::VIM.VirtualMachineRelocateSpec(
+          :diskMoveType => :moveChildMostDiskBacking,
+          :pool => rp
+        )
         spec = RbVmomi::VIM.VirtualMachineCloneSpec(
           :location => relocateSpec,
           :powerOn => true,
