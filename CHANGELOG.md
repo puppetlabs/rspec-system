@@ -1,3 +1,15 @@
+2.7.0
+=====
+
+This is a minor feature release that provides the necessary settings for a
+linked clone when cloning images in VSphere.
+
+#### Detail Changes
+
+* Use vsphere linked cloning (Ken Barber)
+
+-------------------------------
+
 2.6.0
 =====
 
