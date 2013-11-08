@@ -1,10 +1,21 @@
+2.7.1
+=====
+
+This bug fixes ensures all Net::SSH::Exceptions are caught and retried.
+
+#### Detailed Changes
+
+* catch all Net::SSH exceptions (Johan Haals)
+
+-------------------------------
+
 2.7.0
 =====
 
 This is a minor feature release that provides the necessary settings for a
 linked clone when cloning images in VSphere.
 
-#### Detail Changes
+#### Detailed Changes
 
 * Use vsphere linked cloning (Ken Barber)
 
