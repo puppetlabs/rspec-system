@@ -216,7 +216,7 @@ module RSpecSystem
           output << bold(color("localhost$", :green)) << " ssh -l #{opts[:user]} #{opts[:host]}\n"
           Net::SSH.start(opts[:host], opts[:user], opts[:net_ssh_options])
         end
-      rescue Timeout::Error, SystemCallError, Net::SSH::AuthenticationFailed => e
+      rescue Timeout::Error, SystemCallError, Net::SSH::Exception => e
         tries += 1
         output << e.message << "\n"
         if tries < ssh_tries
