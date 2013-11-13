@@ -25,4 +25,8 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "rbvmomi", '~>1.6'
   # It seems 1.6.0 relies on ruby 1.9.2, so lets pin it for now
   s.add_runtime_dependency "nokogiri", '~>1.5.10'
+  s.add_runtime_dependency 'fog', '~> 1.18'
+  # 2.0 drops 1.8.7 support
+  s.add_runtime_dependency 'mime-types', '~> 1.16'
+
 end
