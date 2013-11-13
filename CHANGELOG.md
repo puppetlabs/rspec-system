@@ -1,3 +1,17 @@
+2.7.2
+=====
+
+This bug fixes ensures all SocketErrors for SSH are caught and retried.
+
+It also fixes the last release whereby Net::SSH::Exception was accidentally
+removed at release time.
+
+#### Detailed Changes
+
+* rescue and retry ssh on SocketError and Net::SSH::Exception (Johan Haals)
+
+-------------------------------
+
 2.7.1
 =====
 
