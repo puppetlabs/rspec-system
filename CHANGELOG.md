@@ -1,3 +1,21 @@
+2.8.0
+=====
+
+This feature release includes the new Openstack provider, which allows you to
+now use an Openstack installation for provisioning test nodes. Thanks to Hawk
+Newton for providing this contribution.
+
+Consult the README.md file for more information on this provider.
+
+As this functionality is fairly new, YMMV - but please test away and let us
+know if you find any issues.
+
+#### Detailed Changes
+
+* Openstack provider (Hawk Newton)
+
+-------------------------------
+
 2.7.2
 =====
 
