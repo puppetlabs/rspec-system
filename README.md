@@ -306,6 +306,31 @@ Set these variables, and run the usual rake command specifying the provider:
 
 In Jenkins, set the authentication variables above using environment variable injection. I recommend using the private environment variables feature for user & pass however so these do not get displayed in the console output. As with the vagrant provider however, turn RS\_SET into a test matrix, containing all the sets you want to test against.
 
+#### OpenStack
+
+You may also use [OpenStack](http://www.openstack.org/) as a virtualization provider.
+
+    RS_PROVIDER=openstack
+
+All parameters are required and case sensitive.
+
+* *RS_OPENSTACK_ENDPOINT* -- Your openstack token url, something like `http://your.openstack.url:5000/v2.0/tokens`
+* *RS_OPENSTACK_USERNAME* -- Your openstack username
+* *RS_OPENSTACK_API_KEY* -- password
+* *RS_OPENSTACK_KEYPAIR_NAME* -- ssh keypair name
+* *RS_OPENSTACK_FLAVOR_NAME* -- flavor name
+* *RS_OPENSTACK_IMAGE_NAME* -- image name
+* *RS_OPENSTACK_NETWORK_NAME* -- network name
+* *RS_OPENSTACK_NODE_TIMEOUT* -- Number of seconds to wait for openstack instances to be created
+* *RS_OPENSTACK_SSH_KEYS* -- Full path to ssh private keys, colin (:) delimited
+
+
+##### OpenStack TODO
+* Support `RSPEC_DESTROY=no` and destroying abandoned instances by persisting the server ids in .rspec_system
+* Provide support for floating ips
+* Support explicit tenant ids
+* No custom option support
+
 ### Plugins to rspec-system
 
 Right now we have two types of plugins, the framework is in a state of flux as to how one writes these things but here we go.

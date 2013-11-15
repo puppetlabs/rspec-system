@@ -10,5 +10,6 @@ end
 
 group :development do
   gem 'yard'
-  gem 'redcarpet'
+  # 3.0.0 breaks 1.8.7 support
+  gem 'redcarpet', '~> 2.3.0'
 end
