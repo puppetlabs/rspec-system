@@ -116,6 +116,7 @@ module RSpecSystem
           node_config << "    v.vm.hostname = '#{k}'\n"
           node_config << "    v.vm.box = '#{ps['box']}'\n"
           node_config << "    v.vm.box_url = '#{ps['box_url']}'\n" unless ps['box_url'].nil?
+          node_config << "    v.vm.synced_folder #{ps['synced_folder']}\n" unless ps['synced_folder'].nil?
           node_config << customize_vm(k,options)
           node_config << "    v.vm.provider '#{vagrant_provider_name}' do |prov, override|\n"
           node_config << customize_provider(k,options)
