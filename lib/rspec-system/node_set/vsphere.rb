@@ -1,5 +1,4 @@
 require 'fileutils'
-require 'systemu'
 require 'net/ssh'
 require 'net/scp'
 require 'rbvmomi'

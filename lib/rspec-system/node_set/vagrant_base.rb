@@ -1,5 +1,4 @@
 require 'fileutils'
-require 'systemu'
 require 'net/ssh'
 require 'net/scp'
 require 'rspec-system/node_set/base'
@@ -174,7 +173,7 @@ module RSpecSystem
       end
       self.nodes.each do |k,v|
         Dir.chdir(@vagrant_path) do
-          result = systemu("vagrant ssh-config #{k} >> #{ssh_config_path}")
+          Bundler.clean_system("vagrant ssh-config #{k} >> #{ssh_config_path}")
         end
       end
       ssh_config_path
@@ -186,7 +185,7 @@ module RSpecSystem
     # @param args [String] args to vagrant
     def vagrant(args)
       Dir.chdir(@vagrant_path) do
-        system("vagrant #{args}")
+        Bundler.clean_system("vagrant #{args}")
       end
       nil
     end
