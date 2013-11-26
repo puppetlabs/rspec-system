@@ -54,7 +54,7 @@ RSpec.configure do |c|
       output << bold("Configuration:") << "       #{ns.config.pretty_inspect}"
       output << bold("Virtual Environment:") << " #{ns.provider_type}\n"
       output << bold("Default node:") << "        #{ns.default_node.name}\n"
-      output << bold("Destroy node:") << "        #{ns.destroy}\n"
+      output << bold("Destroy node:") << "        #{ns.destroy ? 'true' : 'false'}\n"
       output << "\n"
       ns.setup
       output << "\n"
