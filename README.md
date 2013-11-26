@@ -220,6 +220,19 @@ For example, to use a different box for CentOS 6.4 x64, you can override the `bo
           box: 'centos-64-x64-vbox4210'
           box_url: 'http://puppet-vagrant-boxes.puppetlabs.com/centos-64-x64-vbox4210.box'
 
+
+By default, the guest machine /vagrant mount will be a temporary directory in your project workspace where the Vagrantfile is created: `/.rspec_system/vagrant_projects/[node set name]/`
+
+To make the /vagrant be another mount point, or to mount other than /vagrant, you can override the `synced_folder` value to specify mount points from host to guest machine.  For example, to make the project root workspace be mounted at `/guest/mount/path` on the guest machine, in .prefab.yml:
+
+    ---
+    'centos-64-x64':
+      provider_specifics:
+        vagrant_virtualbox:
+          synced_folder: '"../../../", "/guest/mount/path"'
+
+
+
 ### Running tests
 
 There are two providers at the moment you can use to launch your nodes for testing:
