@@ -63,15 +63,20 @@ module RSpecSystem
           :config => ssh_config
         })
 
-        # Copy the authorized keys from vagrant user to root then reconnect
-        cmd = 'mkdir /root/.ssh ; cp /home/vagrant/.ssh/authorized_keys /root/.ssh'
+        if RSpec.configuration.rs_use_sudo
+          # Not copying authorized keys, rely on shell from initial connection
+          output << bold(color("#{k} ", :green)) << "Using sudo, not starting root session\n"
+        else
+          # Copy the authorized keys from vagrant user to root then reconnect
+          cmd = 'mkdir /root/.ssh ; cp /home/vagrant/.ssh/authorized_keys /root/.ssh'
 
-        output << bold(color("#{k}$ ", :green)) << cmd << "\n"
-        ssh_exec!(chan, "cd /tmp && sudo sh -c #{shellescape(cmd)}")
+          output << bold(color("#{k}$ ", :green)) << cmd << "\n"
+          ssh_exec!(chan, "cd /tmp && sudo sh -c #{shellescape(cmd)}")
 
-        chan = ssh_connect(:host => k, :user => 'root', :net_ssh_options => {
-          :config => ssh_config
-        })
+          chan = ssh_connect(:host => k, :user => 'root', :net_ssh_options => {
+            :config => ssh_config
+          })
+        end
         RSpec.configuration.rs_storage[:nodes][k][:ssh] = chan
       end
 
