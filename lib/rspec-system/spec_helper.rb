@@ -38,7 +38,7 @@ RSpec.configure do |c|
   c.add_setting :rs_ssh_timeout,
     :default => ENV['RS_SSH_TIMEOUT'] || 60
   c.add_setting :rs_use_sudo,
-    :default => ENV['RS_USE_SUDO'] =~ /(no|false)/ ? false : true
+    :default => ENV['RS_USE_SUDO'] =~ /(yes|true)/ ? true : false
 
   # Storage variable, for internal use only
   # @private
