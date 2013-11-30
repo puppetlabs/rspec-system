@@ -160,7 +160,7 @@ module RSpecSystem::Helpers
     # sudo hack
     if RSpec.configuration.rs_use_sudo
       orig_dest = options[:dp]
-      tmp_dest = "/tmp/.rspec_system#{options[:dp].gsub(/\//, '_')}"
+      tmp_dest = "/tmp/.rspec_system_#{Time.now.getutc.to_i.to_s}#{options[:dp].gsub(/\//, '_')}"
       options[:dp] = tmp_dest
       RSpecSystem::Helpers::Rcp.new(options, self, &block)
       options_ssh = {

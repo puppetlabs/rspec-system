@@ -64,8 +64,8 @@ module RSpecSystem
         })
 
         if RSpec.configuration.rs_use_sudo
-          # Not copying authorized keys, rely on shell from initial connection
-          output << bold(color("#{k} ", :green)) << "Using sudo, not starting root session\n"
+          # Not copying authorized keys, rely on initial connection
+          output << bold(color("[#{k}] ", :green)) << "Using sudo, not starting root session\n"
         else
           # Copy the authorized keys from vagrant user to root then reconnect
           cmd = 'mkdir /root/.ssh ; cp /home/vagrant/.ssh/authorized_keys /root/.ssh'

@@ -8,16 +8,7 @@ require 'tempfile'
 
 include RSpecSystem::Helpers
 
-def to_bool(s)
-  if s
-    s.to_s.downcase == 'true'
-  else
-    false
-  end
-end
-
 RSpec.configure do |c|
-
   include RSpecSystem::Log
   c.include RSpecSystem::Helpers
   c.extend RSpecSystem::Helpers
@@ -47,7 +38,7 @@ RSpec.configure do |c|
   c.add_setting :rs_ssh_timeout,
     :default => ENV['RS_SSH_TIMEOUT'] || 60
   c.add_setting :rs_use_sudo,
-    :default => to_bool(ENV['RS_USE_SUDO'])
+    :default => ENV['RS_USE_SUDO'] =~ /(no|false)/ ? false : true
 
   # Storage variable, for internal use only
   # @private
