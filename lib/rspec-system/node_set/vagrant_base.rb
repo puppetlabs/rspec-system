@@ -153,6 +153,10 @@ module RSpecSystem
         case key
         when 'ip'
           vm_config << "    v.vm.network :private_network, :ip => '#{value}'\n"
+        when 'forward_port'
+          vm_config << "    v.vm.network :forward_port, :guest => #{value['guest']}, :host => #{value['host']}"
+          vm_config << ", auto_correct: true" if value['auto_correct'] == 'true'
+          vm_config << "\n"
         else
           next
         end
