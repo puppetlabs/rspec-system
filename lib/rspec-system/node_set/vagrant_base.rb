@@ -58,18 +58,20 @@ module RSpecSystem
     def connect
       nodes.each do |k,v|
         RSpec.configuration.rs_storage[:nodes][k] ||= {}
+        
+        if v.facts['kernel'] == 'Linux'
+          chan = ssh_connect(:host => k, :user => 'vagrant', :net_ssh_options => {
+            :config => ssh_config
+          })
 
+          # Copy the authorized keys from vagrant user to root then reconnect
+          cmd = 'mkdir /root/.ssh ; cp /home/vagrant/.ssh/authorized_keys /root/.ssh'
+
+          #output << bold(color("#{k}$ ", :green)) << cmd << "\n"
+          ssh_exec!(chan, "cd /tmp && sudo sh -c #{shellescape(cmd)}")
+        end
+        
         chan = ssh_connect(:host => k, :user => 'vagrant', :net_ssh_options => {
-          :config => ssh_config
-        })
-
-        # Copy the authorized keys from vagrant user to root then reconnect
-        cmd = 'mkdir /root/.ssh ; cp /home/vagrant/.ssh/authorized_keys /root/.ssh'
-
-        output << bold(color("#{k}$ ", :green)) << cmd << "\n"
-        ssh_exec!(chan, "cd /tmp && sudo sh -c #{shellescape(cmd)}")
-
-        chan = ssh_connect(:host => k, :user => 'root', :net_ssh_options => {
           :config => ssh_config
         })
         RSpec.configuration.rs_storage[:nodes][k][:ssh] = chan
