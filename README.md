@@ -1,3 +1,7 @@
+# RETIRED
+
+This project has been retired in favour of [beaker](http://rubygems.org/gems/beaker) and its relevant RSpec bridge [beaker-rspec](http://rubygems.org/gems/beaker-rspec). All tickets/PR's are now closed, future development and work should continue there.
+
 # rspec-system
 
 `rspec-system` provides a framework for creating system tests using the `rspec` testing library.
