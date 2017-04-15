@@ -1,5 +1,4 @@
 require 'fileutils'
-require 'systemu'
 require 'net/ssh'
 require 'net/scp'
 require 'rspec-system/node_set/base'
@@ -160,6 +159,17 @@ module RSpecSystem
       vm_config
     end
 
+    # Run a system command with a "clean" env, even if running under Bundler
+    #
+    # @api private
+    def clean_system(*args)
+      if defined?(Bundler)
+        Bundler.clean_system(*args)
+      else
+        system(*args)
+      end
+    end
+
     # Here we get vagrant to drop the ssh_config its using so we can monopolize
     # it for transfers and custom stuff. We drop it into a single file, and
     # since its indexed based on our own node names its quite ideal.
@@ -172,9 +182,10 @@ module RSpecSystem
         File.unlink(ssh_config_path)
       rescue Errno::ENOENT
       end
+
       self.nodes.each do |k,v|
         Dir.chdir(@vagrant_path) do
-          result = systemu("vagrant ssh-config #{k} >> #{ssh_config_path}")
+          clean_system("vagrant ssh-config #{k} >> #{ssh_config_path}")
         end
       end
       ssh_config_path
@@ -186,7 +197,7 @@ module RSpecSystem
     # @param args [String] args to vagrant
     def vagrant(args)
       Dir.chdir(@vagrant_path) do
-        system("vagrant #{args}")
+        clean_system("vagrant #{args}")
       end
       nil
     end

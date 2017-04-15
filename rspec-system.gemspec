@@ -19,7 +19,6 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 1.8.7'
   s.add_runtime_dependency "rspec", '~>2.14'
   s.add_runtime_dependency "kwalify", '~>0.7.2'
-  s.add_runtime_dependency "systemu", '~>2.5'
   s.add_runtime_dependency "net-ssh", '~>2.7'
   s.add_runtime_dependency "net-scp", '~>1.1'
   s.add_runtime_dependency "rbvmomi", '~>1.6'
