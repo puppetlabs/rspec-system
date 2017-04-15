@@ -57,6 +57,8 @@ require 'rspec-system/helpers/rcp'
 module RSpecSystem::Helpers
   # @!group Actions
 
+  include RSpecSystem::Util
+
   # Runs a shell command on a test host.
   #
   # When invoked as a block a result hash is yielded to the block as a
@@ -114,6 +116,11 @@ module RSpecSystem::Helpers
       options = {:c => options}
     end
 
+    # sudo hook
+    if RSpec.configuration.rs_use_sudo
+      options[:c] = "sudo bash -l -c #{shellescape(options[:c])}" unless options[:c].start_with? "sudo"
+    end
+
     RSpecSystem::Helpers::Shell.new(options, self, &block)
   end
 
@@ -150,7 +157,20 @@ module RSpecSystem::Helpers
   #     end
   #   end
   def rcp(options, &block)
-    RSpecSystem::Helpers::Rcp.new(options, self, &block)
+    # sudo hack
+    if RSpec.configuration.rs_use_sudo
+      orig_dest = options[:dp]
+      tmp_dest = "/tmp/.rspec_system_#{Time.now.getutc.to_i.to_s}#{options[:dp].gsub(/\//, '_')}"
+      options[:dp] = tmp_dest
+      RSpecSystem::Helpers::Rcp.new(options, self, &block)
+      options_ssh = {
+        :n => options[:d],
+        :c => "cp -r #{tmp_dest} #{orig_dest}" 
+      }
+      shell(options_ssh)
+    else
+      RSpecSystem::Helpers::Rcp.new(options, self, &block)
+    end
   end
 
   # @!group Queries
