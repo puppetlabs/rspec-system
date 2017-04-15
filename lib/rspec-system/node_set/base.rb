@@ -67,44 +67,47 @@ module RSpecSystem
       nodes.each do |k,v|
         rs_storage = RSpec.configuration.rs_storage[:nodes][k]
 
-        # Fixup profile to avoid noise
-        if v.facts['osfamily'] == 'Debian'
-          shell(:n => k, :c => "sed -i 's/^mesg n/# mesg n/' /root/.profile")
-        end
-
-        # Setup ntp
-        if v.facts['osfamily'] == 'Debian' then
-          shell(:n => k, :c => 'apt-get install -y ntpdate')
-        elsif v.facts['osfamily'] == 'RedHat' then
-          if v.facts['lsbmajdistrelease'] == '5' then
-            shell(:n => k, :c => 'yum install -y ntp')
-          else
-            shell(:n => k, :c => 'yum install -y ntpdate')
+        if v.facts['kernel'] == 'Linux'
+          
+          # Fixup profile to avoid noise
+          if v.facts['osfamily'] == 'Debian'
+            shell(:n => k, :c => "sed -i 's/^mesg n/# mesg n/' /root/.profile")
           end
-        end
-        shell(:n => k, :c => 'ntpdate -u pool.ntp.org')
 
-        # Grab IP address for host, if we don't already have one
-        rs_storage[:ipaddress] ||= shell(:n => k, :c => "ip a|awk '/g/{print$2}' | cut -d/ -f1 | head -1").stdout.chomp
+          # Setup ntp
+          if v.facts['osfamily'] == 'Debian' then
+            shell(:n => k, :c => 'apt-get install -y ntpdate')
+          elsif v.facts['osfamily'] == 'RedHat' then
+            if v.facts['lsbmajdistrelease'] == '5' then
+              shell(:n => k, :c => 'yum install -y ntp')
+            else
+              shell(:n => k, :c => 'yum install -y ntpdate')
+            end
+          end
+          shell(:n => k, :c => 'ntpdate -u pool.ntp.org')
 
-        # Configure local hostname and hosts file
-        shell(:n => k, :c => "hostname #{k}")
+          # Grab IP address for host, if we don't already have one
+          rs_storage[:ipaddress] ||= shell(:n => k, :c => "ip a|awk '/g/{print$2}' | cut -d/ -f1 | head -1").stdout.chomp
 
-        if v.facts['osfamily'] == 'Debian' then
-          shell(:n => k, :c => "echo '#{k}' > /etc/hostname")
-        end
+          # Configure local hostname and hosts file
+          shell(:n => k, :c => "hostname #{k}")
 
-        hosts = <<-EOS
+          if v.facts['osfamily'] == 'Debian' then
+            shell(:n => k, :c => "echo '#{k}' > /etc/hostname")
+          end
+
+          hosts = <<-EOS
 #{rs_storage[:ipaddress]} #{k}
 127.0.0.1 #{k} localhost
 ::1 #{k} localhost
         EOS
-        shell(:n => k, :c => "echo '#{hosts}' > /etc/hosts")
+          shell(:n => k, :c => "echo '#{hosts}' > /etc/hosts")
 
-        # Display setup for diagnostics
-        shell(:n => k, :c => 'cat /etc/hosts')
-        shell(:n => k, :c => 'hostname')
-        shell(:n => k, :c => 'hostname -f')
+          # Display setup for diagnostics
+          shell(:n => k, :c => 'cat /etc/hosts')
+          shell(:n => k, :c => 'hostname')
+          shell(:n => k, :c => 'hostname -f')
+        end
       end
       nil
     end

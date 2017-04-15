@@ -31,6 +31,8 @@ module RSpecSystem
           custom_config << "    prov.customize ['modifyvm', :id, '--#{key}','#{value}']\n"
         when 'mac'
           custom_config << "    prov.customize ['modifyvm', :id, '--macaddress1','#{value}']\n"
+        when 'gui'
+          custom_config << "    prov.gui = #{value}"
         else
           log.warn("Skipped invalid custom option for node #{name}: #{key}=#{value}")
         end
